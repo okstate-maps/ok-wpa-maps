@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/ok-wpa-maps/precache-manifest.464ceee18c756bad2a7594b759018c4c.js"
+  "/ok-wpa-maps/precache-manifest.d82c17ba3dc166e80824bb28afe783c3.js"
 );
 
 self.addEventListener('message', (event) => {
