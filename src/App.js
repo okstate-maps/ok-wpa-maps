@@ -25,6 +25,18 @@ function App() {
   const [workflow, setWorkflow] = useState(0);
   const [modalContent, setModalContent] = useState('');
   const [runIntro, toggleIntro] = useState(false);
+  const [creatorCount, setCreatorCount] = useState('___');
+  var listOfRandomPraise= [
+    'Good job!',
+    'Way to go!',
+    'Wow!',
+    'That\'s super!',
+    'Awesome!'
+  ];
+  const [randomPraise, setRandomPraise] = useState(
+    listOfRandomPraise[Math.floor(Math.random() * Math.floor(listOfRandomPraise.length))]
+  );
+
   const [steps, setSteps] = useState([
     {
       content: 
@@ -54,14 +66,35 @@ function App() {
     // },
 
     {
-      content: <h1>Review existing entries</h1>,
+      content: 
+      <div>
+        <h1>Review existing entries</h1>
+        <h3>If you don't see any errors, click <strong><calcite-icon scale='s' icon="check"></calcite-icon>Looks Good!</strong></h3>
+        <div className='imgContainer'>
+          <img alt='Reviewing parcels' 
+               src={process.env.PUBLIC_URL + '/img/wpa7.gif'}/>
+        </div>
+      </div>,
+      placement: 'auto',
+      target: '.reviewShapes'    
+    },
+    {
+      content: 
+      <div>
+        <h1>Review existing entries</h1>
+        <h3>If you see something incorrect or missing, click <strong><calcite-icon scale='s' icon="pencil"></calcite-icon>Edit feature</strong></h3>
+        <div className='imgContainer'>
+          <img alt='Reviewing parcels' 
+               src={process.env.PUBLIC_URL + '/img/wpa8.gif'}/>
+        </div>
+      </div>,
       placement: 'auto',
       target: '.reviewShapes'    
     },
     {
       content: 
       <>
-        <p>Right click and drag to change the rotation of the map.</p>
+        <h3>Right click and drag to change the rotation of the map.</h3>
         <div className='imgContainer'>
           <img alt='Demonstration of rotating the map' 
                src={process.env.PUBLIC_URL + '/img/wpa4.gif'}/>
@@ -100,21 +133,44 @@ function App() {
   }
 
   useEffect(() => {
-    loadModules(["esri/identity/OAuthInfo","esri/identity/IdentityManager",], { css: true })
-    .then(([OAuthInfo, esriId]) => {
+    loadModules(['esri/identity/OAuthInfo','esri/identity/IdentityManager',
+                 'esri/layers/FeatureLayer',], { css: true })
+    .then(([OAuthInfo, esriId, FeatureLayer]) => {
+    
       var info = new OAuthInfo({
-          appId: "l3OWRmRCGfkAN4Dh",
-          portalUrl: "https://osu-geog.maps.arcgis.com/",
+          appId: 'l3OWRmRCGfkAN4Dh',
+          portalUrl: 'https://osu-geog.maps.arcgis.com/',
           popup: false
       });
 
       esriId.registerOAuthInfos([info]);
 
       esriId
-        .checkSignInStatus(info.portalUrl + "/sharing")
+        .checkSignInStatus(info.portalUrl + '/sharing')
         .then((creds) => {
+          var layer =  new FeatureLayer({
+            url: 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Maps_Land_Parcels/FeatureServer/0'
+          });
+          var q = layer.createQuery();
+          q.where = 'CREATOR = \'' + creds.userId + '\'';
+          q.outStatistics =[
+            {
+              onStatisticField: 'CREATOR',
+              outStatisticFieldName: 'CREATOR_COUNT',
+              statisticType: 'count'
+            }
+          ];
+    
+          layer.queryFeatures(q).then(resp => {
+            if (resp.features.length > 0){
+              setCreatorCount(resp.features[0].getAttribute('CREATOR_COUNT'));
+            }
+
+          })
         })
-        .catch(esriId.getCredential(info.portalUrl + "/sharing"));
+        .catch(esriId.getCredential(info.portalUrl + '/sharing'));
+
+      
    });
 
   }, []);
@@ -151,6 +207,7 @@ function App() {
           <>
             <h1>Choose your path:</h1>
             
+            
             <button className='drawShapes' onClick={() => {toggleWelcomeScreen(false); setWorkflow('create')}}>
                 <calcite-icon scale='l' class="big-icon" icon="addInNew"></calcite-icon> 
                 <br/>Draw some shapes
@@ -163,8 +220,9 @@ function App() {
             <h2>or</h2>
             <button onClick={() => {toggleIntro(!runIntro)}}>
                 <calcite-icon scale='l' class="big-icon" icon="question"></calcite-icon> 
-                <br/>View the intro!
+                <br/>View the intro
             </button>
+        <h3>So far you've added <span style={{fontSize:'2em'}}>{creatorCount}</span> {creatorCount === 1 ? 'shape' : 'shapes'}. {randomPraise}</h3>
           </>
         }
         

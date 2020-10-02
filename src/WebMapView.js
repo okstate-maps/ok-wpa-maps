@@ -1,4 +1,5 @@
 import React from 'react';
+import "@esri/calcite-components";
 import { loadModules } from 'esri-loader';
 
 function getRandomInt(max) {
@@ -24,7 +25,6 @@ export class WebMapView extends React.Component {
                   updateFeature: null,
                   mapRotation: 0
                 };
-    window.waah = this;
   }
 
   getRandomParcel() {
@@ -149,6 +149,27 @@ export class WebMapView extends React.Component {
 
       this.view.ui.add(refreshButton, 'bottom-left');
 
+      // var changeModeButton = document.createElement('div');
+      // var changeModeIcon = this.workflow === 'create' ? 'esri-icon-edit-attributes' : 'esri-icon-add-in-new';
+      // changeModeButton.className = changeModeIcon + ' esri-widget--button esri-widget esri-interactive ';
+      // changeModeButton.title = this.workflow === 'create' ? 
+      //       'Go to another random section.' : 
+      //       'Get another entry to review.';
+      // changeModeButton.addEventListener('clickButton', () => {
+      //   switch (this.workflow) {
+      //     case 'create': 
+      //       this.getRandomSection();
+      //       break;
+      //     case 'update':
+      //       this.getRandomParcel();
+      //       break;
+      //     default:
+      //       alert('moo');
+      //   }
+      // });
+
+      // this.view.ui.add(changeModeButton, 'top-left');
+
       //measurement widget, but let's not use it for now
       /*
       this.measurement = new AreaMeasurement2D({
@@ -232,8 +253,6 @@ export class WebMapView extends React.Component {
                 fieldName: 'OwnerOrgName',
                 label: 'Owner (if an entity or organization)'
               }
-              
-           
           ]
         },
 
