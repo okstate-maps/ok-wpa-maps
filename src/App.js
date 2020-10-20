@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
-import Joyride, { CallBackProps, STATUS, Step, StoreHelpers } from 'react-joyride';
 import { loadModules } from 'esri-loader';
+import { IntroJoyride } from './IntroJoyride';
 import { WebMapView } from './WebMapView';
 
 //import { loadScript, loadModules } from 'esri-loader';
@@ -26,87 +26,22 @@ function App() {
   const [modalContent, setModalContent] = useState('');
   const [runIntro, toggleIntro] = useState(false);
   const [creatorCount, setCreatorCount] = useState('___');
+  const [creds, setCreds] = useState(false);
+  const [userName, setUserName] = useState('______');
+
   var listOfRandomPraise= [
     'Good job!',
     'Way to go!',
     'Wow!',
     'That\'s super!',
-    'Awesome!'
+    'Awesome!',
+    'Alright!'
   ];
   const [randomPraise, setRandomPraise] = useState(
     listOfRandomPraise[Math.floor(Math.random() * Math.floor(listOfRandomPraise.length))]
   );
 
-  const [steps, setSteps] = useState([
-    {
-      content: 
-          <div>
-            <h1>Draw and transcribe map data</h1>
-            <div className='imgContainer'>
-              <img alt='Draw a shape representing a 
-                    parcel of land and transcribe the ' 
-                  src={process.env.PUBLIC_URL + '/img/wpa3.gif'}/>
-            </div>
-          </div>,
-      placement: 'auto',
-      target: '.drawShapes',
-      disableBeacon: true
-    },    
-    // {
-    //   content: 
-    //       <div>
-    //         <h1>Draw and transcribe map data</h1>
-    //         <div>
-              
-    //         </div>
-    //       </div>,
-    //   placement: 'auto',
-    //   target: '.drawShapes',
-    //   disableBeacon: false
-    // },
-
-    {
-      content: 
-      <div>
-        <h1>Review existing entries</h1>
-        <h3>If you don't see any errors, click <strong><calcite-icon scale='s' icon="check"></calcite-icon>Looks Good!</strong></h3>
-        <div className='imgContainer'>
-          <img alt='Reviewing parcels' 
-               src={process.env.PUBLIC_URL + '/img/wpa7.gif'}/>
-        </div>
-      </div>,
-      placement: 'auto',
-      target: '.reviewShapes'    
-    },
-    {
-      content: 
-      <div>
-        <h1>Review existing entries</h1>
-        <h3>If you see something incorrect or missing, click <strong><calcite-icon scale='s' icon="pencil"></calcite-icon>Edit feature</strong></h3>
-        <div className='imgContainer'>
-          <img alt='Reviewing parcels' 
-               src={process.env.PUBLIC_URL + '/img/wpa8.gif'}/>
-        </div>
-      </div>,
-      placement: 'auto',
-      target: '.reviewShapes'    
-    },
-    {
-      content: 
-      <>
-        <h3>Right click and drag to change the rotation of the map.</h3>
-        <div className='imgContainer'>
-          <img alt='Demonstration of rotating the map' 
-               src={process.env.PUBLIC_URL + '/img/wpa4.gif'}/>
-        </div>
-        <p> Press the compass button to reset</p>
-      </>,
-      placement: 'center',
-      target: 'body'
-    }
-    
-  ]);
-
+  
 
 
   Modal.setAppElement('#root');
@@ -124,18 +59,10 @@ function App() {
     setIsOpen(false);
   }
 
-  function handleJoyrideCallback(data) {
-    const { status, type } = data;
-    const finishedStatuses = [STATUS.FINISHED, STATUS.SKIPPED];
-    if (finishedStatuses.includes(status)) {
-      toggleIntro(false);
-    }
-  }
-
   useEffect(() => {
     loadModules(['esri/identity/OAuthInfo','esri/identity/IdentityManager',
-                 'esri/layers/FeatureLayer',], { css: true })
-    .then(([OAuthInfo, esriId, FeatureLayer]) => {
+                 'esri/layers/FeatureLayer', 'esri/portal/Portal'], { css: true })
+    .then(([OAuthInfo, esriId, FeatureLayer, Portal]) => {
     
       var info = new OAuthInfo({
           appId: 'l3OWRmRCGfkAN4Dh',
@@ -148,6 +75,10 @@ function App() {
       esriId
         .checkSignInStatus(info.portalUrl + '/sharing')
         .then((creds) => {
+          setCreds(creds);
+          var portal = new Portal(info.portalUrl).load().then((p) => {
+            setUserName(p.user.fullName);
+          });
           var layer =  new FeatureLayer({
             url: 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Maps_Land_Parcels/FeatureServer/0'
           });
@@ -178,21 +109,8 @@ function App() {
 
     return (
       <div className="App">
-        <Joyride
-          callback={handleJoyrideCallback}
-          continuous={true}
-          run={runIntro}
-          scrollToFirstStep={true}
-          showProgress={true}
-          showSkipButton={true}
-          steps={steps}
-          styles={{
-            options: {
-              zIndex: 10000,
-              width: 800
-            },
-          }}
-        />
+        <IntroJoyride runIntro={runIntro}
+                      toggleIntro={toggleIntro} />
         <Modal
           isOpen={modalIsOpen}
           onAfterOpen={afterOpenModal}
@@ -222,7 +140,8 @@ function App() {
                 <calcite-icon scale='l' class="big-icon" icon="question"></calcite-icon> 
                 <br/>View the intro
             </button>
-        <h3>So far you've added <span style={{fontSize:'2em'}}>{creatorCount}</span> {creatorCount === 1 ? 'shape' : 'shapes'}. {randomPraise}</h3>
+        <h3>Hi {userName}! So far you've added <span style={{fontSize:'2em'}}>{creatorCount}</span> {creatorCount === 1 ? 'shape' : 'shapes'}. {randomPraise}</h3>
+        <p>Not {userName}? <button onClick={function(){creds.destroy(); window.location.reload();}}>Click this button to logout</button></p>
           </>
         }
         
