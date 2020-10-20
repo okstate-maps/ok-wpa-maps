@@ -1,22 +1,22 @@
 {
   "files": {
     "main.css": "/ok-wpa-maps/static/css/main.cf365dc5.chunk.css",
-    "main.js": "/ok-wpa-maps/static/js/main.a8745c5f.chunk.js",
-    "main.js.map": "/ok-wpa-maps/static/js/main.a8745c5f.chunk.js.map",
+    "main.js": "/ok-wpa-maps/static/js/main.b39addc9.chunk.js",
+    "main.js.map": "/ok-wpa-maps/static/js/main.b39addc9.chunk.js.map",
     "runtime-main.js": "/ok-wpa-maps/static/js/runtime-main.6329608f.js",
     "runtime-main.js.map": "/ok-wpa-maps/static/js/runtime-main.6329608f.js.map",
-    "static/js/2.5f88d362.chunk.js": "/ok-wpa-maps/static/js/2.5f88d362.chunk.js",
-    "static/js/2.5f88d362.chunk.js.map": "/ok-wpa-maps/static/js/2.5f88d362.chunk.js.map",
+    "static/js/2.f879886f.chunk.js": "/ok-wpa-maps/static/js/2.f879886f.chunk.js",
+    "static/js/2.f879886f.chunk.js.map": "/ok-wpa-maps/static/js/2.f879886f.chunk.js.map",
     "index.html": "/ok-wpa-maps/index.html",
-    "precache-manifest.eaa90891a4e3c1d1df577c79c6541976.js": "/ok-wpa-maps/precache-manifest.eaa90891a4e3c1d1df577c79c6541976.js",
+    "precache-manifest.4fad2b8278216a2dec98a0915027de5f.js": "/ok-wpa-maps/precache-manifest.4fad2b8278216a2dec98a0915027de5f.js",
     "service-worker.js": "/ok-wpa-maps/service-worker.js",
     "static/css/main.cf365dc5.chunk.css.map": "/ok-wpa-maps/static/css/main.cf365dc5.chunk.css.map",
-    "static/js/2.5f88d362.chunk.js.LICENSE.txt": "/ok-wpa-maps/static/js/2.5f88d362.chunk.js.LICENSE.txt"
+    "static/js/2.f879886f.chunk.js.LICENSE.txt": "/ok-wpa-maps/static/js/2.f879886f.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.6329608f.js",
-    "static/js/2.5f88d362.chunk.js",
+    "static/js/2.f879886f.chunk.js",
     "static/css/main.cf365dc5.chunk.css",
-    "static/js/main.a8745c5f.chunk.js"
+    "static/js/main.b39addc9.chunk.js"
   ]
 }
