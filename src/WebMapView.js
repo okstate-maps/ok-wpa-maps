@@ -55,6 +55,16 @@ export class WebMapView extends React.Component {
         return this.sectionsLayer.queryExtent();
       })
       .then((response) => {
+        //this.setState({'sectionExtent': response.extent});
+        // this.view.whenLayerView(this.WPAMapsLandParcels).then(function(layerView){
+        //   layerView.filter = {
+        //     geometry: response.extent,
+        //     spatialRelationship: 'intersects',
+        //     'distance': 50,
+        //     units: 'miles'
+
+        //   }
+        // });
         this.view.goTo(response.extent);
     })
   }
@@ -287,7 +297,7 @@ export class WebMapView extends React.Component {
         popupTemplate: template,
         formTemplate: formTemplate,
         groupDisplay: 'sequential'
-      });
+        });
 
       
       this.WPAMapsLandParcels.on('edits', (e) => {
@@ -401,6 +411,15 @@ export class WebMapView extends React.Component {
           this.getRandomSection();
           this.map.add(this.sectionsLayer);
           this.WPAMapsLandParcels.popupEnabled = false;
+          // var q = this.WPAMapsLandParcels.createQuery();
+          // q.geometry = this.state.sectionExtent;
+          // q.distance = 5;
+          // q.units = 'miles';
+          // q.returnGeometry = true;
+          // this.WPAMapsLandParcels.queryObjectIds(q).then(resp => {
+          //   this.WPAMapsLandParcels.definitionExpression = "OBJECTID in [" +resp.toString() + "]";
+
+          // });
           this.view.ui.add(this.editor, 'bottom-right');
           //this.editor.startCreateWorkflowAtFeatureCreation({layer: WPAMapsLandParcels, template: template});
       }
