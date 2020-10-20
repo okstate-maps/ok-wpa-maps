@@ -1,10 +1,10 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "009c6ed67bd20ef3c58e6f70e78f96ad",
+    "revision": "826b9179948d30b9926c94e0ada6e1ee",
     "url": "/ok-wpa-maps/index.html"
   },
   {
-    "revision": "70e330d1744f0e435eda",
+    "revision": "c13cb65cebaca66be737",
     "url": "/ok-wpa-maps/static/css/main.cf365dc5.chunk.css"
   },
   {
@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/ok-wpa-maps/static/js/2.f879886f.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "70e330d1744f0e435eda",
-    "url": "/ok-wpa-maps/static/js/main.b39addc9.chunk.js"
+    "revision": "c13cb65cebaca66be737",
+    "url": "/ok-wpa-maps/static/js/main.f5d3b097.chunk.js"
   },
   {
     "revision": "4a81045370226f30b0da",
