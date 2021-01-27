@@ -1,5 +1,4 @@
 import React from 'react';
-import "@esri/calcite-components";
 import { loadModules } from 'esri-loader';
 
 function getRandomInt(max) {
@@ -10,7 +9,7 @@ export class WebMapView extends React.Component {
   constructor(props) {
     super(props);
     this.WPATilesUrl = 'https://tiles.arcgis.com/tiles/jWQlP64OuwDh6GGX/arcgis/rest/services/_wpa_all_6Aug2020/MapServer';
-    this.WPAMapsLandParcelsUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Maps_Land_Parcels/FeatureServer/0';
+    this.WPAMapsLandParcelsUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Maps_Land_Parcels_Public/FeatureServer/0';
     this.sectionsLayerUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/ArcGIS/rest/services/Oklahoma_Public_Land_Survey_Sections/FeatureServer/0';
     this.mapRef = React.createRef();
     this.workflow = props.workflow;
@@ -25,7 +24,7 @@ export class WebMapView extends React.Component {
                   updateFeature: null,
                   mapRotation: 0
                 };
-  }
+    }
 
   getRandomParcel() {
     var that = this;
@@ -49,25 +48,35 @@ export class WebMapView extends React.Component {
 
     var randomSectionId = getRandomInt(70915);
     this.sectionsLayer.definitionExpression = 'OBJECTID = ' + randomSectionId;
-          
+    var sectionExtent;
+    
     this.sectionsLayer
-      .when(() => {
-        return this.sectionsLayer.queryExtent();
-      })
-      .then((response) => {
-        //this.setState({'sectionExtent': response.extent});
-        // this.view.whenLayerView(this.WPAMapsLandParcels).then(function(layerView){
-        //   layerView.filter = {
-        //     geometry: response.extent,
-        //     spatialRelationship: 'intersects',
-        //     'distance': 50,
-        //     units: 'miles'
-
-        //   }
-        // });
-        this.view.goTo(response.extent);
-    })
-  }
+        .when(() =>{
+            return this.sectionsLayer.queryExtent();
+        })
+        .then((response) => {
+          sectionExtent = response.extent;
+          let query = this.WPAMapsLandParcels.createQuery();
+              query.spatialRelationship = 'contains';
+              query.distance = 250;
+              query.units = 'feet';
+              query.returnCentroid = true;
+              query.returnGeometry = false;
+              query.geometry = response.extent; 
+          return this.WPAMapsLandParcels.queryFeatures(query)
+         }).then((resp) => {
+            console.log(resp);
+            if (resp.features.length === 0){
+              console.log('found an empty section');
+              this.view.goTo(sectionExtent);
+            }
+            else {
+              //this.view.goTo(sectionExtent);
+              console.log("There are " + resp.features.length + " features already in this section");
+              this.getRandomSection();
+            }
+         });
+    }
 
   reviewWorkflow() {
     var that = this;    
@@ -96,17 +105,16 @@ export class WebMapView extends React.Component {
                  'esri/layers/TileLayer',
                  'esri/widgets/Compass',
                  'esri/widgets/Editor',
-                 'esri/core/watchUtils',
-                 'esri/widgets/AreaMeasurement2D'], { css: true })
+                 //'esri/widgets/DistanceMeasurement2D'
+                 'esri/core/watchUtils'], { css: true })
     .then(([ArcGISMap, Basemap, MapView, FeatureLayer, 
-            FeatureLayerView, TileLayer, Compass, Editor, 
-            watchUtils, AreaMeasurement2D]) => {
+            FeatureLayerView, TileLayer, Compass, Editor,
+            //DistanceMeasurement2D,
+            watchUtils]) => {
 
       const WPATiles = new TileLayer({
         url: this.WPATilesUrl
-      })
-      //this.map.add(WPATiles);
-
+      });
 
       this.map = new ArcGISMap({
         basemap: new Basemap({baseLayers:[WPATiles]})
@@ -159,37 +167,16 @@ export class WebMapView extends React.Component {
 
       this.view.ui.add(refreshButton, 'bottom-left');
 
-      // var changeModeButton = document.createElement('div');
-      // var changeModeIcon = this.workflow === 'create' ? 'esri-icon-edit-attributes' : 'esri-icon-add-in-new';
-      // changeModeButton.className = changeModeIcon + ' esri-widget--button esri-widget esri-interactive ';
-      // changeModeButton.title = this.workflow === 'create' ? 
-      //       'Go to another random section.' : 
-      //       'Get another entry to review.';
-      // changeModeButton.addEventListener('clickButton', () => {
-      //   switch (this.workflow) {
-      //     case 'create': 
-      //       this.getRandomSection();
-      //       break;
-      //     case 'update':
-      //       this.getRandomParcel();
-      //       break;
-      //     default:
-      //       alert('moo');
-      //   }
+      //measurement widget, but let's not use it for now
+      
+      // this.measurement = new DistanceMeasurement2D({
+      //   view: this.view,
+      //   activeTool: 'distance',
+      //   unit: 'feet'
       // });
 
-      // this.view.ui.add(changeModeButton, 'top-left');
-
-      //measurement widget, but let's not use it for now
-      /*
-      this.measurement = new AreaMeasurement2D({
-        view: this.view,
-        activeTool: 'area',
-        unit: 'acres'
-      });
-
       this.view.ui.add(this.measurement, 'bottom-left');
-      */
+      
 
       const editThisAction = {
           title: 'Edit feature',
@@ -263,6 +250,8 @@ export class WebMapView extends React.Component {
                 fieldName: 'OwnerOrgName',
                 label: 'Owner (if an entity or organization)'
               }
+              
+           
           ]
         },
 
@@ -297,13 +286,22 @@ export class WebMapView extends React.Component {
         popupTemplate: template,
         formTemplate: formTemplate,
         groupDisplay: 'sequential'
-        });
+      });
 
       
       this.WPAMapsLandParcels.on('edits', (e) => {
-        if (e.updatedFeatures.length > 0) {
+        if (e.updatedFeatures.length > 0 && this.highlightedFeature) {
           this.sayThanks();
           this.view.ui.remove(this.editor);
+        }
+        if (e.addedFeatures.length > 0) {
+          let addedFeatureId = e.addedFeatures[0].objectId;
+          let addedFeature = this.WPAMapsLandParcels.queryFeatures({objectIds: [addedFeatureId],
+                                                                    outFields: ['OBJECTID','CREATOR_PUBLIC']}).then(
+            (feats) => {feats.features[0].setAttribute('CREATOR_PUBLIC', this.props.creds.userId);
+              let edits = {updateFeatures: [feats.features[0]]}
+              this.WPAMapsLandParcels.applyEdits(edits);});
+   
         }
       } );
 
@@ -411,15 +409,6 @@ export class WebMapView extends React.Component {
           this.getRandomSection();
           this.map.add(this.sectionsLayer);
           this.WPAMapsLandParcels.popupEnabled = false;
-          // var q = this.WPAMapsLandParcels.createQuery();
-          // q.geometry = this.state.sectionExtent;
-          // q.distance = 5;
-          // q.units = 'miles';
-          // q.returnGeometry = true;
-          // this.WPAMapsLandParcels.queryObjectIds(q).then(resp => {
-          //   this.WPAMapsLandParcels.definitionExpression = "OBJECTID in [" +resp.toString() + "]";
-
-          // });
           this.view.ui.add(this.editor, 'bottom-right');
           //this.editor.startCreateWorkflowAtFeatureCreation({layer: WPAMapsLandParcels, template: template});
       }

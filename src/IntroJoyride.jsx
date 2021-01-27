@@ -41,7 +41,9 @@ export function IntroJoyride(props) {
         </div>
       </div>,
       placement: 'auto',
-      target: '.reviewShapes'    
+      target: '.reviewShapes',
+      disableBeacon: true
+    
     },
     {
       content: 
@@ -54,7 +56,9 @@ export function IntroJoyride(props) {
         </div>
       </div>,
       placement: 'auto',
-      target: '.reviewShapes'    
+      target: '.reviewShapes',
+      disableBeacon: true
+
     },
     {
       content: 
@@ -67,7 +71,9 @@ export function IntroJoyride(props) {
         <p> Press the compass button to reset</p>
       </>,
       placement: 'center',
-      target: 'body'
+      target: 'body',
+      disableBeacon: true
+
     }
     
   ]);
@@ -84,6 +90,7 @@ export function IntroJoyride(props) {
    <Joyride
           callback={handleJoyrideCallback}
           continuous={true}
+          floaterProps={{disableAnimation:true}}
           run={props.runIntro}
           scrollToFirstStep={true}
           showProgress={true}

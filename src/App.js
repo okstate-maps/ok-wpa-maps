@@ -25,9 +25,11 @@ function App() {
   const [workflow, setWorkflow] = useState(0);
   const [modalContent, setModalContent] = useState('');
   const [runIntro, toggleIntro] = useState(false);
-  const [creatorCount, setCreatorCount] = useState('___');
+  const [creatorCount, setCreatorCount] = useState(false);
   const [creds, setCreds] = useState(false);
-  const [userName, setUserName] = useState('______');
+  const [userName, setUserName] = useState(false);
+  const [esriId, setEsriId] = useState(false);
+  const [info, setInfo] = useState(false);
 
   var listOfRandomPraise= [
     'Good job!',
@@ -40,9 +42,6 @@ function App() {
   const [randomPraise, setRandomPraise] = useState(
     listOfRandomPraise[Math.floor(Math.random() * Math.floor(listOfRandomPraise.length))]
   );
-
-  
-
 
   Modal.setAppElement('#root');
 
@@ -66,12 +65,13 @@ function App() {
     
       var info = new OAuthInfo({
           appId: 'l3OWRmRCGfkAN4Dh',
-          portalUrl: 'https://osu-geog.maps.arcgis.com/',
           popup: false
       });
 
+      setInfo(info);
+      setEsriId(esriId);
       esriId.registerOAuthInfos([info]);
-
+      
       esriId
         .checkSignInStatus(info.portalUrl + '/sharing')
         .then((creds) => {
@@ -79,14 +79,16 @@ function App() {
           var portal = new Portal(info.portalUrl).load().then((p) => {
             setUserName(p.user.fullName);
           });
+
+
           var layer =  new FeatureLayer({
-            url: 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Maps_Land_Parcels/FeatureServer/0'
+            url: 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Maps_Land_Parcels_Public/FeatureServer/0'
           });
           var q = layer.createQuery();
-          q.where = 'CREATOR = \'' + creds.userId + '\'';
+          q.where = 'CREATOR_PUBLIC = \'' + creds.userId + '\'';
           q.outStatistics =[
             {
-              onStatisticField: 'CREATOR',
+              onStatisticField: 'CREATOR_PUBLIC',
               outStatisticFieldName: 'CREATOR_COUNT',
               statisticType: 'count'
             }
@@ -99,7 +101,10 @@ function App() {
 
           })
         })
-        .catch(esriId.getCredential(info.portalUrl + '/sharing'));
+        .catch(() => {
+
+          //esriId.getCredential(info.portalUrl + '/sharing')
+        });
 
       
    });
@@ -140,14 +145,31 @@ function App() {
                 <calcite-icon scale='l' class="big-icon" icon="question"></calcite-icon> 
                 <br/>View the intro
             </button>
-        <h3>Hi {userName}! So far you've added <span style={{fontSize:'2em'}}>{creatorCount}</span> {creatorCount === 1 ? 'shape' : 'shapes'}. {randomPraise}</h3>
-        <p>Not {userName}? <button onClick={function(){creds.destroy(); window.location.reload();}}>Click this button to logout</button></p>
+            {userName === false &&
+              <>
+                <br/><br/>
+                <button onClick={function(){esriId.getCredential(info.portalUrl + '/sharing')
+                  .then((credential)=>{setCreds(credential);})}}>
+                  <calcite-icon scale='l' class="big-icon" icon="sign-in"></calcite-icon> 
+                <br/> Sign in (if you want to keep track of your progress)</button>
+              </>
+            }
+            {userName !== false && creatorCount !== false &&
+              <>
+                <h3>Hi {userName}! So far you've added <span style={{fontSize:'2em'}}>{creatorCount}</span> {creatorCount === 1 ? 'shape' : 'shapes'}. {randomPraise}</h3>
+                <br/><button onClick={function(){creds.destroy(); window.location.reload();}}>
+                   <calcite-icon scale='l' class="big-icon" icon="sign-out"></calcite-icon> <br/> Click to sign out
+                  </button>
+              </>
+            }
+        
           </>
         }
         
         {welcomeScreen === false &&
           <WebMapView 
             workflow={workflow} 
+            creds={creds}
             openModal={openModal}
             closeModal={closeModal}
             setModalContent={setModalContent}/>
