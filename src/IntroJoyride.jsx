@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Joyride, { CallBackProps, STATUS, Step, StoreHelpers } from 'react-joyride';
-
 export function IntroJoyride(props) {
 	const [steps, setSteps] = useState([
+  
     {
       content: 
           <div>
@@ -74,7 +74,31 @@ export function IntroJoyride(props) {
       target: 'body',
       disableBeacon: true
 
-    }
+    },
+    {
+      content: 
+      <>
+        <h3>Keep track of your progress.</h3>
+        <div className='imgContainer'>
+        </div>
+        <p>Sign in with your ArcGIS Online account. Or, <a href={"https://www.arcgis.com/sharing/rest/oauth2/signup?client_id=l3OWRmRCGfkAN4Dh&redirect_uri=http://localhost:3000/ok-wpa-maps&response_type=code"}>
+create one</a> for free.</p>
+
+      </>,
+      placement: 'center',
+      target: '.trackProgress',
+      disableBeacon: true
+
+    },
+    {
+      content: 
+          <div>
+            <a href="https://info.library.okstate.edu/map-room/wpa-maps"><h1>Click to learn more about the collection</h1></a>
+          </div>,
+      placement: 'center',
+      target: 'body',
+      disableBeacon: true
+    },      
     
   ]);
 

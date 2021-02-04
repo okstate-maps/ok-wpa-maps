@@ -1,4 +1,5 @@
 import React from 'react';
+import {CreateFormTemplate, ReviewFormTemplate} from './FormTemplates';
 import { loadModules } from 'esri-loader';
 
 function getRandomInt(max) {
@@ -8,82 +9,86 @@ function getRandomInt(max) {
 export class WebMapView extends React.Component {
   constructor(props) {
     super(props);
-    this.WPATilesUrl = 'https://tiles.arcgis.com/tiles/jWQlP64OuwDh6GGX/arcgis/rest/services/_wpa_all_6Aug2020/MapServer';
-    this.WPAMapsLandParcelsUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Maps_Land_Parcels_Public/FeatureServer/0';
-    this.sectionsLayerUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/ArcGIS/rest/services/Oklahoma_Public_Land_Survey_Sections/FeatureServer/0';
+    this.featureTileUrl = 'https://tiles.arcgis.com/tiles/jWQlP64OuwDh6GGX/arcgis/rest/services/_wpa_all_6Aug2020/MapServer';
+    this.featureVectorUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Maps_Land_Parcels_Public/FeatureServer/0';
+    this.backgroundFeatureUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/ArcGIS/rest/services/Oklahoma_Public_Land_Survey_Sections/FeatureServer/0';
     this.mapRef = React.createRef();
     this.workflow = props.workflow;
     this.editThis = this.editThis.bind(this);
     this.sayThanks = this.sayThanks.bind(this);
     this.reviewWorkflow = this.reviewWorkflow.bind(this);
-    this.getRandomParcel = this.getRandomParcel.bind(this);
-    this.getRandomSection = this.getRandomSection.bind(this);
+    this.getRandomFeatureForReview = this.getRandomFeatureForReview.bind(this);
+    this.getRandomBackgroundFeature = this.getRandomBackgroundFeature.bind(this);
+    this.toggleLoadIndicator = this.toggleLoadIndicator.bind(this);
     this.rotationChange = this.rotationChange.bind(this);
     this.updateTimesChecked = this.updateTimesChecked.bind(this);
     this.state = {
                   updateFeature: null,
-                  mapRotation: 0
+                  mapRotation: 0,
+                  backgroundFeatureObjectIds: null,
+                  loadIndicator: true
                 };
     }
 
-  getRandomParcel() {
+  getRandomFeatureForReview() {
     var that = this;
     var randomId = getRandomInt(this.objectIds.length - 1);     
-    var q = this.WPAMapsLandParcels.createQuery();
+    var q = this.featureVectorLayer.createQuery();
     q.where = 'OBJECTID = ' + this.objectIds[randomId];
-    //this.WPAMapsLandParcels.definitionExpression = 'OBJECTID = ' + this.objectIds[randomId];
-    this.WPAMapsLandParcels.queryFeatures(q).then((response) => {
+    this.featureVectorLayer.queryFeatures(q).then((response) => {
       that.view.goTo(response.features[0].geometry.extent);
       that.view.popup.features = response.features;
       that.view.popup.visible = true;
       that.setState({updateFeature: response.features[0]});
-      this.view.whenLayerView(this.WPAMapsLandParcels).then(function(layerView){
+      this.view.whenLayerView(this.featureVectorLayer).then(function(layerView){
         that.highlightedFeature = layerView.highlight(response.features[0]);
       });
     });
 
   }
 
-  getRandomSection() {
+  getRandomBackgroundFeature() {
+    var backgroundFeatureExtent;
+    var oids = this.state.backgroundFeatureObjectIds;
+    var featId = oids[getRandomInt(oids.length)];
 
-    var randomSectionId = getRandomInt(70915);
-    this.sectionsLayer.definitionExpression = 'OBJECTID = ' + randomSectionId;
-    var sectionExtent;
+    this.backgroundFeatureLayer.definitionExpression = 'OBJECTID = ' + featId;
     
-    this.sectionsLayer
+    this.backgroundFeatureLayer
         .when(() =>{
-            return this.sectionsLayer.queryExtent();
+            return this.backgroundFeatureLayer.queryExtent();
         })
         .then((response) => {
-          sectionExtent = response.extent;
-          let query = this.WPAMapsLandParcels.createQuery();
+          backgroundFeatureExtent = response.extent;
+          let query = this.featureVectorLayer.createQuery();
               query.spatialRelationship = 'contains';
               query.distance = 250;
               query.units = 'feet';
               query.returnCentroid = true;
               query.returnGeometry = false;
               query.geometry = response.extent; 
-          return this.WPAMapsLandParcels.queryFeatures(query)
+          return this.featureVectorLayer.queryFeatures(query)
          }).then((resp) => {
-            console.log(resp);
             if (resp.features.length === 0){
-              console.log('found an empty section');
-              this.view.goTo(sectionExtent);
+              this.view.goTo(backgroundFeatureExtent);
             }
             else {
-              //this.view.goTo(sectionExtent);
-              console.log("There are " + resp.features.length + " features already in this section");
-              this.getRandomSection();
+              this.getRandomBackgroundFeature();
             }
          });
     }
 
   reviewWorkflow() {
     var that = this;    
-    this.WPAMapsLandParcels.queryObjectIds().then((objectIds) => {
+    this.featureVectorLayer.queryObjectIds().then((objectIds) => {
       that.objectIds = objectIds;
-      that.getRandomParcel();
+      that.getRandomFeatureForReview();
     });
+  }
+
+  toggleLoadIndicator(newLoadVal, oldLoadVal) {
+    this.setState({"loadIndicator": newLoadVal});
+    this.loadIndicatorWatch.remove(); //remove after initial load. It gets too messy IMO 
   }
 
   rotationChange(newRot, oldRot, propName) {
@@ -93,6 +98,14 @@ export class WebMapView extends React.Component {
 
     if (oldRot !== 0 && newRot === 0) {
       this.view.ui.remove(this.compass);
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    //console.log("componentDidUpdate");
+    if (prevState.backgroundFeatureObjectIds === null &&
+      this.state.backgroundFeatureObjectIds !== null) {
+      this.getRandomBackgroundFeature();
     }
   }
   
@@ -112,14 +125,14 @@ export class WebMapView extends React.Component {
             //DistanceMeasurement2D,
             watchUtils]) => {
 
-      const WPATiles = new TileLayer({
-        url: this.WPATilesUrl
+      const featureTileLayer = new TileLayer({
+        url: this.featureTileUrl
       });
 
       this.map = new ArcGISMap({
-        basemap: new Basemap({baseLayers:[WPATiles]})
+        basemap: new Basemap({baseLayers:[featureTileLayer]})
       });
-
+      
       this.view = new MapView({
         container: this.mapRef.current,
         map: this.map,
@@ -144,21 +157,22 @@ export class WebMapView extends React.Component {
         view: this.view
       });
       
+      this.loadIndicatorWatch = this.view.watch('updating', this.toggleLoadIndicator);
       this.view.watch('rotation', this.rotationChange);
 
       var refreshButton = document.createElement('div');
-
-      refreshButton.className = 'esri-icon-refresh esri-widget--button esri-widget esri-interactive ';
-      refreshButton.title = this.workflow === 'create' ? 
-            'Go to another random section.' : 
+          refreshButton.className = 'esri-icon-refresh esri-widget--button esri-widget esri-interactive ';
+          refreshButton.title = this.workflow === 'create' ? 
+            'Go to another random location.' : 
             'Get another entry to review.';
+      
       refreshButton.addEventListener('click', () => {
         switch (this.workflow) {
           case 'create': 
-            this.getRandomSection();
+            this.getRandomBackgroundFeature();
             break;
           case 'update':
-            this.getRandomParcel();
+            this.getRandomFeatureForReview();
             break;
           default:
             alert('moo');
@@ -174,133 +188,29 @@ export class WebMapView extends React.Component {
       //   activeTool: 'distance',
       //   unit: 'feet'
       // });
-
-      this.view.ui.add(this.measurement, 'bottom-left');
+      //this.view.ui.add(this.measurement, 'bottom-left');
       
 
-      const editThisAction = {
-          title: 'Edit feature',
-          id: 'edit-this',
-          className: 'esri-icon-edit'
-        };
-
-      const thisLooksOkAction = {
-          title: 'Looks good!',
-          id: 'this-looks-ok',
-          className: 'esri-icon-check-mark'
-        };
-
-      const template = {
-        title: 'Please doublecheck the info below.',
-        content: [
-          {
-            type: 'fields',
-            fieldInfos: [
-              {
-                fieldName: 'OwnerLastName',
-                label: 'Owner\'s Last Name (if an individual)'
-              },
-
-              {
-                fieldName: 'OwnerFirstNameAndMI',
-                label: 'Owner\'s First Name or initials (if an individual)'
-              },   
-              {
-                fieldName: 'OwnerOrgName',
-                label: 'Owner (if an entity or organization)'
-              },
-              {
-                fieldName: 'LandValue',
-                label: 'Land Value'
-              },
-              {
-                fieldName: 'ImprovementsValue2',
-                label: 'Improvements Value'
-              },
-              {
-                fieldName: 'TaxExempt',
-                label: 'Marked with an X?'
-              }
-            ]
-          }
-        ],
-        //overwriteActions: true,
-        actions: [thisLooksOkAction, editThisAction]
-      }
-
-      const formTemplate = {
-        title: 'Land Info',
-        elements: [{ // Autocasts to new GroupElement
-          type: 'group',
-          label: 'Owner Information',
-          elements: [
-              {
-                type: 'field',
-                fieldName: 'OwnerLastName',
-                label: 'Owner\'s Last Name (if an individual)'
-              },
-
-              {
-                type: 'field',
-                fieldName: 'OwnerFirstNameAndMI',
-                label: 'Owner\'s First Name or initials (if an individual)'
-              },   
-              {
-                type: 'field',
-                fieldName: 'OwnerOrgName',
-                label: 'Owner (if an entity or organization)'
-              }
-              
-           
-          ]
-        },
-
-        { // Autocasts to new GroupElement
-          type: 'group',
-          label: 'Land and Improvement Valuation',
-          elements: [
-             {
-                type: 'field',
-                fieldName: 'LandValue',
-                label: 'Land Value'
-              },
-              {
-                type: 'field',
-                fieldName: 'ImprovementsValue2',
-                label: 'Improvements Value'
-              },
-          ]
-        },
-
-           {
-                type: 'field',
-                fieldName: 'TaxExempt',
-                label: 'Marked with an X?'
-              }
-
-        ]
-      }
-
-      this.WPAMapsLandParcels = new FeatureLayer({
-        url: this.WPAMapsLandParcelsUrl,
-        popupTemplate: template,
-        formTemplate: formTemplate,
+      this.featureVectorLayer = new FeatureLayer({
+        url: this.featureVectorUrl,
+        popupTemplate: ReviewFormTemplate,
+        formTemplate: CreateFormTemplate,
         groupDisplay: 'sequential'
       });
 
       
-      this.WPAMapsLandParcels.on('edits', (e) => {
+      this.featureVectorLayer.on('edits', (e) => {
         if (e.updatedFeatures.length > 0 && this.highlightedFeature) {
           this.sayThanks();
           this.view.ui.remove(this.editor);
         }
         if (e.addedFeatures.length > 0) {
           let addedFeatureId = e.addedFeatures[0].objectId;
-          let addedFeature = this.WPAMapsLandParcels.queryFeatures({objectIds: [addedFeatureId],
+          let addedFeature = this.featureVectorLayer.queryFeatures({objectIds: [addedFeatureId],
                                                                     outFields: ['OBJECTID','CREATOR_PUBLIC']}).then(
             (feats) => {feats.features[0].setAttribute('CREATOR_PUBLIC', this.props.creds.userId);
               let edits = {updateFeatures: [feats.features[0]]}
-              this.WPAMapsLandParcels.applyEdits(edits);});
+              this.featureVectorLayer.applyEdits(edits);});
    
         }
       } );
@@ -308,48 +218,9 @@ export class WebMapView extends React.Component {
       this.editor = new Editor({
           view: this.view,
           allowedWorkflows: [this.workflow],
-          supportingWidgetDefaults: {
-            featureForm: {
-              groupDisplay: 'sequential',
-              fieldConfig: [
-              {
-                name: 'OwnerLastName',
-                label: 'Owner\'s Last Name (if an individual)',
-                required: false
-              },
-
-              {
-                name: 'OwnerFirstNameAndMI',
-                label: 'Owner\'s First Name or initials (if an individual)',
-                required: false
-              },   
-              {
-                name: 'OwnerOrgName',
-                label: 'Owner (if an entity or organization)',
-                required: false
-              },
-              {
-                name: 'LandValue',
-                label: 'Land Value',
-                required: false
-              },
-              {
-                name: 'ImprovementsValue2',
-                label: 'Improvements Value',
-                required: false
-              },
-             {
-                name: 'TaxExempt',
-                label: 'Marked with an X?',
-                required: false
-              }
-            ],
-            }
-          },
           layerInfos: [{
             view: this.view,
-            layer: this.WPAMapsLandParcels,
-            //fieldConfig: 
+            layer: this.featureVectorLayer,
             allowAttachments: false,
             deleteEnabled: false
           }]
@@ -399,18 +270,20 @@ export class WebMapView extends React.Component {
 
           });   
 
-      // for creation, pick a random PLSS Section and zoom to it
+      // for creation, pick a random background feature and zoom to it
       if (this.workflow === 'create') {
           
-          this.sectionsLayer = new FeatureLayer({
-            url: this.sectionsLayerUrl
+          this.backgroundFeatureLayer = new FeatureLayer({
+            url: this.backgroundFeatureUrl
           });
 
-          this.getRandomSection();
-          this.map.add(this.sectionsLayer);
-          this.WPAMapsLandParcels.popupEnabled = false;
+          this.backgroundFeatureLayer.queryObjectIds()
+            .then((oids) => {
+              that.setState({"backgroundFeatureObjectIds": oids});
+              that.map.add(this.backgroundFeatureLayer);
+          });
+          this.featureVectorLayer.popupEnabled = false;
           this.view.ui.add(this.editor, 'bottom-right');
-          //this.editor.startCreateWorkflowAtFeatureCreation({layer: WPAMapsLandParcels, template: template});
       }
 
       // for reviewing, pick a random polygon and zoom to it
@@ -418,9 +291,7 @@ export class WebMapView extends React.Component {
         this.reviewWorkflow();
       }
 
-      this.map.add(this.WPAMapsLandParcels);
-
-      //this.view.ui.add(this.editor, 'top-right');
+      this.map.add(this.featureVectorLayer);
       });
   }
 
@@ -429,7 +300,7 @@ export class WebMapView extends React.Component {
     var currentTimesChecked = upFeat.getAttribute('timesChecked');
     upFeat.setAttribute('timesChecked', currentTimesChecked + 1);
     var edits = {updateFeatures: [upFeat]};
-    this.WPAMapsLandParcels.applyEdits(edits);
+    this.featureVectorLayer.applyEdits(edits);
     this.highlightedFeature.remove();
   }
 
@@ -448,7 +319,7 @@ export class WebMapView extends React.Component {
       }, 2000);
 
     this.highlightedFeature.remove();
-    this.getRandomParcel();
+    this.getRandomFeatureForReview();
     this.view.popup.close();
   }
   editThis() {
@@ -506,6 +377,7 @@ export class WebMapView extends React.Component {
   render() {
     return (
       <>
+        {this.state.loadIndicator && <div className='loadIndicator'>LOADING</div>} 
         <div className='webmap' ref={this.mapRef} />
       </>
     );

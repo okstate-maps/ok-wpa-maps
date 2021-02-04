@@ -5,7 +5,19 @@ html, body, #root, div.App, div.webmap {
   background-color: #ededed;
 }
 
-div.App > button {
+.flex-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+
+.flex-row h2 {
+  line-height: 2;
+}
+.flex-row button {
+  line-height: 1.5;
+  margin: 15px;
   padding: 5px 15px;
   border-radius: 3px;
   background-color: white;
@@ -15,11 +27,11 @@ div.App > button {
   max-width: 200px;
 }
 
-div.App > button:hover  {
+.flex-row button:hover  {
   background-color: #e5e5e5;
 }
 
-div.App > button:active  {
+.flex-row button:active  {
   background-color: #bfbfbf;
 }
 

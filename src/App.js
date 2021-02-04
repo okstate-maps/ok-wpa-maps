@@ -8,6 +8,32 @@ import { WebMapView } from './WebMapView';
 import "@esri/calcite-components";
 import './App.css';
 
+const config = {
+  appId: 'l3OWRmRCGfkAN4Dh',
+  redirect_uri: window.location
+  };
+
+
+function parseHashArgs(aURL) {
+
+  aURL = aURL || window.location.href;
+  
+  var vars = {};
+  var hashes = aURL.slice(aURL.indexOf('#') + 1).split('&');
+
+    for(var i = 0; i < hashes.length; i++) {
+       var hash = hashes[i].split('=');
+      
+       if(hash.length > 1) {
+         vars[hash[0]] = hash[1];
+       } else {
+        vars[hash[0]] = null;
+       }      
+    }
+
+    return vars;
+}
+
 const customStyles = {
   content : {
     top                   : '50%',
@@ -39,13 +65,16 @@ function App() {
     'Awesome!',
     'Alright!'
   ];
+
+
   const [randomPraise, setRandomPraise] = useState(
     listOfRandomPraise[Math.floor(Math.random() * Math.floor(listOfRandomPraise.length))]
   );
 
+  let signUpUrl = "https://www.arcgis.com/sharing/rest/oauth2/signup?client_id=" + config.appId +"&redirect_uri="+config.redirect_uri+"&response_type=token";
   Modal.setAppElement('#root');
 
-    function openModal() {
+  function openModal() {
     setIsOpen(true);
   }
 
@@ -64,13 +93,28 @@ function App() {
     .then(([OAuthInfo, esriId, FeatureLayer, Portal]) => {
     
       var info = new OAuthInfo({
-          appId: 'l3OWRmRCGfkAN4Dh',
+          appId: 'l3OWRmRCGfkAN4Dh', //your app id goes here
           popup: false
       });
 
       setInfo(info);
       setEsriId(esriId);
       esriId.registerOAuthInfos([info]);
+
+
+      let hash = parseHashArgs();
+      if ("access_token" in hash) {
+        let token = hash.access_token;
+        let un = hash.username;
+        let exp = hash.expires_in;
+        esriId.registerToken({
+          token: token,
+          userId: un,
+          expires: exp,
+          server: "https://www.arcgis.com/sharing/rest"
+        });
+        esriId.getCredential(info.portalUrl + '/sharing');;
+      }
       
       esriId
         .checkSignInStatus(info.portalUrl + '/sharing')
@@ -115,52 +159,65 @@ function App() {
     return (
       <div className="App">
         <IntroJoyride runIntro={runIntro}
-                      toggleIntro={toggleIntro} />
+                      toggleIntro={toggleIntro} 
+                      oauthInfo={info}/>
         <Modal
           isOpen={modalIsOpen}
           onAfterOpen={afterOpenModal}
           onRequestClose={closeModal}
           style={customStyles}
-          contentLabel="Example Modal"
+          contentLabel="Modal"
         >
           {modalContent}
         </Modal>
 
         {welcomeScreen === true &&
           <>
-            <h1>Choose your path:</h1>
+
+            <h1>Oklahoma 1936 Land Ownership Map Transcription</h1>
             
-            
-            <button className='drawShapes' onClick={() => {toggleWelcomeScreen(false); setWorkflow('create')}}>
-                <calcite-icon scale='l' class="big-icon" icon="addInNew"></calcite-icon> 
-                <br/>Draw some shapes
-            </button>
-            <h2>or</h2>
-            <button className='reviewShapes' onClick={() => {toggleWelcomeScreen(false); setWorkflow('update')}}>
-                <calcite-icon scale='l' class="big-icon" icon="editAttributes"></calcite-icon> 
-                <br/>Review existing shapes
-            </button>
-            <h2>or</h2>
-            <button onClick={() => {toggleIntro(!runIntro)}}>
-                <calcite-icon scale='l' class="big-icon" icon="question"></calcite-icon> 
-                <br/>View the intro
-            </button>
+            <div className='flex-row'>
+              <button className='drawShapes' onClick={() => {toggleWelcomeScreen(false); setWorkflow('create')}}>
+                  <calcite-icon scale='l' class="big-icon" icon="addInNew"></calcite-icon> 
+                  <br/>Draw some shapes
+              </button>
+              <button className='reviewShapes' onClick={() => {toggleWelcomeScreen(false); setWorkflow('update')}}>
+                  <calcite-icon scale='l' class="big-icon" icon="editAttributes"></calcite-icon> 
+                  <br/>Review existing shapes
+              </button>
+              <button onClick={() => {toggleIntro(!runIntro)}}>
+                  <calcite-icon scale='l' class="big-icon" icon="question"></calcite-icon> 
+                  <br/>View the intro
+              </button>
+            </div>
+
             {userName === false &&
-              <>
+            <div className="trackProgress">
+              <h2>Track your progress:</h2>
+              <div className='flex-row'>
                 <br/><br/>
-                <button onClick={function(){esriId.getCredential(info.portalUrl + '/sharing')
-                  .then((credential)=>{setCreds(credential);})}}>
-                  <calcite-icon scale='l' class="big-icon" icon="sign-in"></calcite-icon> 
-                <br/> Sign in (if you want to keep track of your progress)</button>
-              </>
+                <button className='signInOut' onClick={function(){esriId.getCredential(info.portalUrl + '/sharing')
+                  .then((credential) => {setCreds(credential);})}}>
+                  <calcite-icon scale='l' className="big-icon" icon="sign-in"></calcite-icon> 
+                <br/> Sign in</button>
+
+                <a href={signUpUrl}><button className='createAccount'>
+                  <calcite-icon scale='l' className="big-icon" icon="user-plus"></calcite-icon> 
+                <br/> Create an account</button></a>
+              </div> 
+            </div>
+              //"https://www.arcgis.com/sharing/rest/oauth2/signup?client_id=l3OWRmRCGfkAN4Dh&redirect_uri=http://localhost:3000/ok-wpa-maps&response_type=code"
             }
             {userName !== false && creatorCount !== false &&
-              <>
-                <h3>Hi {userName}! So far you've added <span style={{fontSize:'2em'}}>{creatorCount}</span> {creatorCount === 1 ? 'shape' : 'shapes'}. {randomPraise}</h3>
-                <br/><button onClick={function(){creds.destroy(); window.location.reload();}}>
+              <div class='flex-row'>
+                <h3>Hi {userName}! So far you've added 
+                  <span style={{fontSize:'2em'}}>&nbsp;{creatorCount}&nbsp;</span> 
+                    {creatorCount === 1 ? 'shape' : 'shapes'}. {creatorCount > 0 ? randomPraise : ''}
+                </h3>
+                <br/><button className='signInOut' onClick={function(){creds.destroy(); window.location.hash = ''; window.location.reload();}}>
                    <calcite-icon scale='l' class="big-icon" icon="sign-out"></calcite-icon> <br/> Click to sign out
                   </button>
-              </>
+              </div>
             }
         
           </>
