@@ -214,7 +214,7 @@ function App() {
                   <span style={{fontSize:'2em'}}>&nbsp;{creatorCount}&nbsp;</span> 
                     {creatorCount === 1 ? 'shape' : 'shapes'}. {creatorCount > 0 ? randomPraise : ''}
                 </h3>
-                <br/><button className='signInOut' onClick={function(){creds.destroy(); window.location.hash = ''; window.location.reload();}}>
+                <br/><button className='signInOut' onClick={function(){creds.destroy(); window.location = window.location.pathname}}>
                    <calcite-icon scale='l' class="big-icon" icon="sign-out"></calcite-icon> <br/> Click to sign out
                   </button>
               </div>
