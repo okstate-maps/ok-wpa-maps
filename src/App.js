@@ -10,7 +10,7 @@ import './App.css';
 
 const config = {
   appId: 'l3OWRmRCGfkAN4Dh',
-  redirect_uri: window.location.pathname
+  redirect_uri: window.location.host + window.location.pathname
   };
 
 
