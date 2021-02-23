@@ -1,11 +1,11 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "75c937ded8dba0aa97d5249485d11427",
+    "revision": "314f73570fa4d151cb517d14c86126ca",
     "url": "/ok-wpa-maps/index.html"
   },
   {
-    "revision": "e26145fe4f5639c4f287",
-    "url": "/ok-wpa-maps/static/css/main.c814b8ee.chunk.css"
+    "revision": "219d6bff166175696f1c",
+    "url": "/ok-wpa-maps/static/css/main.5a11a736.chunk.css"
   },
   {
     "revision": "9f8a72a211cf991ba283",
@@ -16,11 +16,15 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/ok-wpa-maps/static/js/2.22a75ad4.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "e26145fe4f5639c4f287",
-    "url": "/ok-wpa-maps/static/js/main.b09b3bf1.chunk.js"
+    "revision": "219d6bff166175696f1c",
+    "url": "/ok-wpa-maps/static/js/main.bfdf77da.chunk.js"
   },
   {
     "revision": "4a81045370226f30b0da",
     "url": "/ok-wpa-maps/static/js/runtime-main.6329608f.js"
+  },
+  {
+    "revision": "287b2a0bd78e49cb65c142406c52950b",
+    "url": "/ok-wpa-maps/static/media/loader.287b2a0b.svg"
   }
 ]);
