@@ -1,6 +1,7 @@
 import React from 'react';
 import {CreateFormTemplate, ReviewFormTemplate} from './FormTemplates';
 import { loadModules } from 'esri-loader';
+import {ReactComponent as LoadIndicator} from './loader.svg';
 
 function getRandomInt(max) {
     return Math.floor(Math.random() * Math.floor(max));
@@ -12,9 +13,11 @@ export class WebMapView extends React.Component {
     this.featureTileUrl = 'https://tiles.arcgis.com/tiles/jWQlP64OuwDh6GGX/arcgis/rest/services/_wpa_all_6Aug2020/MapServer';
     this.featureVectorUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Maps_Land_Parcels_Public/FeatureServer/0';
     this.backgroundFeatureUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/ArcGIS/rest/services/Oklahoma_Public_Land_Survey_Sections/FeatureServer/0';
+    this.reviewerTableUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Reviewers/FeatureServer/0';
     this.mapRef = React.createRef();
     this.workflow = props.workflow;
     this.editThis = this.editThis.bind(this);
+
     this.sayThanks = this.sayThanks.bind(this);
     this.reviewWorkflow = this.reviewWorkflow.bind(this);
     this.getRandomFeatureForReview = this.getRandomFeatureForReview.bind(this);
@@ -118,12 +121,15 @@ export class WebMapView extends React.Component {
                  'esri/layers/TileLayer',
                  'esri/widgets/Compass',
                  'esri/widgets/Editor',
+                 'esri/Graphic',
                  //'esri/widgets/DistanceMeasurement2D'
                  'esri/core/watchUtils'], { css: true })
     .then(([ArcGISMap, Basemap, MapView, FeatureLayer, 
-            FeatureLayerView, TileLayer, Compass, Editor,
+            FeatureLayerView, TileLayer, Compass, Editor, Graphic,
             //DistanceMeasurement2D,
             watchUtils]) => {
+
+      this.graphic = Graphic;
 
       const featureTileLayer = new TileLayer({
         url: this.featureTileUrl
@@ -288,6 +294,10 @@ export class WebMapView extends React.Component {
 
       // for reviewing, pick a random polygon and zoom to it
       if (this.workflow === 'update') {
+        this.reviewerTable = new FeatureLayer({
+          url: this.reviewerTableUrl
+        });
+
         this.reviewWorkflow();
       }
 
@@ -299,7 +309,31 @@ export class WebMapView extends React.Component {
     var upFeat = this.state.updateFeature;
     var currentTimesChecked = upFeat.getAttribute('timesChecked');
     upFeat.setAttribute('timesChecked', currentTimesChecked + 1);
+
     var edits = {updateFeatures: [upFeat]};
+    
+    if (this.props.creds) {
+      console.log("user is logged in.");
+      this.reviewerTable.queryFeatures(
+      {
+        where: "userId = '" + this.props.creds.userId + "'",
+        outFields: ['OBJECTID','reviewCount']
+      }).then(
+        (feats) => {
+          if (feats.features.length > 0) {
+            feats.features[0].setAttribute('reviewCount', feats.features[0].attributes.reviewCount + 1);
+            this.reviewerTable.applyEdits({updateFeatures:[feats.features[0]]});
+          }
+          else {
+            this.reviewerTable.applyEdits({addFeatures: [new this.graphic({attributes: {
+              "userId": this.props.creds.userId,
+              "reviewCount": 1
+            }})]});
+          }
+        }
+      );    //this.reviewerTable
+    }
+
     this.featureVectorLayer.applyEdits(edits);
     this.highlightedFeature.remove();
   }
@@ -377,7 +411,11 @@ export class WebMapView extends React.Component {
   render() {
     return (
       <>
-        {this.state.loadIndicator && <div className='loadIndicator'>LOADING</div>} 
+        {this.state.loadIndicator && 
+          <div className='loadIndicator'>
+            <LoadIndicator/>
+          </div>
+        }
         <div className='webmap' ref={this.mapRef} />
       </>
     );

@@ -209,7 +209,7 @@ function App() {
               //"https://www.arcgis.com/sharing/rest/oauth2/signup?client_id=l3OWRmRCGfkAN4Dh&redirect_uri=http://localhost:3000/ok-wpa-maps&response_type=code"
             }
             {userName !== false && creatorCount !== false &&
-              <div class='flex-row'>
+              <div className='flex-row'>
                 <h3>Hi {userName}! So far you've added 
                   <span style={{fontSize:'2em'}}>&nbsp;{creatorCount}&nbsp;</span> 
                     {creatorCount === 1 ? 'shape' : 'shapes'}. {creatorCount > 0 ? randomPraise : ''}
