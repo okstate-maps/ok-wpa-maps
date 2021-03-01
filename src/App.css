@@ -107,17 +107,17 @@ div.App div.bigIcon {
 
 
 .svg-loader{
-  height: 20vmin;
-  vertical-align: top;
-}
+  width:150px;
+  animation:spin 1.5s linear infinite;
+  }
 
 div.loadIndicator {
-  position: absolute;
-  top: 40vmin;
-  left: 45vmax;
+  display: flex;
+  position:fixed;
+  height:100%;
+  width:100%;
+  justify-content: center;
   z-index: 100;
-  animation:spin 1.5s linear infinite;
-
 }
 
 @-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
