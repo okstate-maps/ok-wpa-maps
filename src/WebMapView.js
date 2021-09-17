@@ -10,10 +10,13 @@ function getRandomInt(max) {
 export class WebMapView extends React.Component {
   constructor(props) {
     super(props);
+
+    //TODO move these URLs into a separate file
     this.featureTileUrl = 'https://tiles.arcgis.com/tiles/jWQlP64OuwDh6GGX/arcgis/rest/services/_wpa_all_6Aug2020/MapServer';
     this.featureVectorUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Maps_Land_Parcels_Public/FeatureServer/0';
     this.backgroundFeatureUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/ArcGIS/rest/services/Oklahoma_Public_Land_Survey_Sections/FeatureServer/0';
     this.reviewerTableUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Reviewers/FeatureServer/0';
+
     this.mapRef = React.createRef();
     this.workflow = props.workflow;
     this.editThis = this.editThis.bind(this);
@@ -105,7 +108,6 @@ export class WebMapView extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    //console.log("componentDidUpdate");
     if (prevState.backgroundFeatureObjectIds === null &&
       this.state.backgroundFeatureObjectIds !== null) {
       this.getRandomBackgroundFeature();
@@ -121,23 +123,29 @@ componentDidMount() {
      'esri/layers/TileLayer',
      'esri/widgets/Compass',
      'esri/widgets/Editor',
+     'esri/widgets/Sketch',
      'esri/Graphic',
                  //'esri/widgets/DistanceMeasurement2D'
                  'esri/core/watchUtils'], { css: true })
     .then(([ArcGISMap, Basemap, MapView, FeatureLayer, 
-      FeatureLayerView, TileLayer, Compass, Editor, Graphic,
+      FeatureLayerView, TileLayer, Compass, Editor, Sketch, Graphic,
             //DistanceMeasurement2D,
             watchUtils]) => {
 
       this.graphic = Graphic;
 
-      const featureTileLayer = new TileLayer({
+      let featureTileLayer = new TileLayer({
         url: this.featureTileUrl
       });
-
+      
       this.map = new ArcGISMap({
         basemap: new Basemap({baseLayers:[featureTileLayer]})
       });
+      
+      this.backgroundFeatureLayer = new FeatureLayer({
+        url: this.backgroundFeatureUrl
+      });
+
       
       this.view = new MapView({
         container: this.mapRef.current,
@@ -155,8 +163,6 @@ componentDidMount() {
             breakpoint: false
           }
         }
-        //center: [-98.5, 35.5],
-        //zoom: 8
       });
 
       this.compass = new Compass({
@@ -195,7 +201,7 @@ componentDidMount() {
       //   unit: 'feet'
       // });
       //this.view.ui.add(this.measurement, 'bottom-left');
-      
+         
 
       this.featureVectorLayer = new FeatureLayer({
         url: this.featureVectorUrl,
@@ -221,19 +227,31 @@ componentDidMount() {
 
           }
         } );
-
+      var that = this;
       this.editor = new Editor({
         view: this.view,
         allowedWorkflows: [this.workflow],
+        snappingOptions: {
+           enabled: true,
+           featureSources: [
+             { layer: this.featureVectorLayer },
+              {layer: this.backgroundFeatureLayer}
+            ]
+           },
         layerInfos: [{
           view: this.view,
           layer: this.featureVectorLayer,
           allowAttachments: false,
           deleteEnabled: false
-        }]
+        }],
+        supportingWidgetDefaults: {
+          featureForm: {
+            id: 'featureFormKD'
+          }
+        }
+        
       });
-
-
+     
       // I can't believe this is the only way to override widget labelling, but here we are
       this.editor.postInitialize = function(){
         watchUtils.init(this,'messages', (messages) => {
@@ -243,29 +261,43 @@ componentDidMount() {
         });
       };
 
+      //prepopulate fields after done sketching shape
+      this.editor.viewModel.sketchViewModel.on('create', 
+        function(e){
+          if (e.state === "complete"){
+            e.graphic.attributes= {"TaxExempt":"No"};
+          }
+
+        }
+      );
+
       //an attempt to prevent identical features from being created due to lack of feedback
       //from the editor widget
-      this.editor.viewModel.watch('syncing', function(newVal,oldVal, propName, target){
-        let editButton = document.getElementsByClassName('esri-editor__control-button');
-        if (editButton.length === 0){
-          return;
-        }
+      this.editor.viewModel.watch('syncing', 
+        function(newVal,oldVal, propName, target){
+          
+          let editButton = document.getElementsByClassName('esri-editor__control-button');
+          if (editButton.length === 0){
+            return;
+          }
         
-        if (newVal === true) {
+          that.toggleLoadIndicator(newVal,oldVal); 
+            
+          if (newVal === true) {
+            editButton[0].disabled = 'disabled';
+            editButton[0].classList.add('esri-button--disabled');
+          }
 
-          editButton[0].disabled = 'disabled';
-          editButton[0].classList.add('esri-button--disabled');
+          if (newVal === false) {
+
+            editButton[0].removeAttribute('disabled');
+            editButton[0].classList.remove('esri-button--disabled');
+          }
         }
-
-        if (newVal === false) {
-
-          editButton[0].removeAttribute('disabled');
-          editButton[0].classList.remove('esri-button--disabled');
-        }
-      })
+      );
 
       // Event handler that fires each time an action is clicked
-      var that = this;
+      
       this.view.popup.on('trigger-action', function (event) {
         if (event.action.id === 'edit-this') {
           that.editThis();
@@ -275,20 +307,17 @@ componentDidMount() {
           that.updateTimesChecked();
         }
 
-      });   
+      });       
 
       // for creation, pick a random background feature and zoom to it
       if (this.workflow === 'create') {
-
-        this.backgroundFeatureLayer = new FeatureLayer({
-          url: this.backgroundFeatureUrl
-        });
-
+    
         this.backgroundFeatureLayer.queryObjectIds()
-        .then((oids) => {
-          that.setState({"backgroundFeatureObjectIds": oids});
-          that.map.add(this.backgroundFeatureLayer);
-        });
+          .then((oids) => {
+            that.setState({"backgroundFeatureObjectIds": oids});
+            that.map.add(this.backgroundFeatureLayer);
+          });
+
         this.featureVectorLayer.popupEnabled = false;
         this.view.ui.add(this.editor, 'bottom-right');
       }
@@ -319,20 +348,35 @@ updateTimesChecked() {
 incrementReviewerCount() {
   if (this.props.creds) {
     this.reviewerTable.queryFeatures(
-    {
-      where: "userId = '" + this.props.creds.userId + "'",
-      outFields: ['OBJECTID','reviewCount']
-    }).then(
+      {
+        where: "userId = '" + this.props.creds.userId + "'",
+        outFields: ['OBJECTID','reviewCount']
+      }).then(
     (feats) => {
       if (feats.features.length > 0) {
-        feats.features[0].setAttribute('reviewCount', feats.features[0].attributes.reviewCount + 1);
-        this.reviewerTable.applyEdits({updateFeatures:[feats.features[0]]});
+        
+        feats.features[0].setAttribute(
+          'reviewCount', 
+          feats.features[0].attributes.reviewCount + 1
+        );
+
+        this.reviewerTable.applyEdits(
+          {
+            updateFeatures:[feats.features[0]]
+          }
+        );
       }
       else {
-        this.reviewerTable.applyEdits({addFeatures: [new this.graphic({attributes: {
-          "userId": this.props.creds.userId,
-          "reviewCount": 1
-        }})]}); //holy moly look at all those!
+        this.reviewerTable.applyEdits(
+          {
+            addFeatures: [new this.graphic({
+              attributes: {
+                "userId": this.props.creds.userId,
+                "reviewCount": 1
+              }
+            })]
+          }
+        ); 
       }
     }
        );    //this.reviewerTable
@@ -343,6 +387,7 @@ incrementReviewerCount() {
 sayThanks() {
   var that = this;
 
+  //TODO move this to a separate template
   this.props.setModalContent(
     <div>
     <h1>Thank you!</h1>
@@ -353,7 +398,7 @@ sayThanks() {
   setTimeout(function(){
     that.props.closeModal(); 
   }, 2000);
-
+  this.toggleLoadIndicator(false);
   this.highlightedFeature.remove();
   this.getRandomFeatureForReview();
   this.view.popup.close();
