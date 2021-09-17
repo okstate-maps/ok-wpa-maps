@@ -1,23 +1,23 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "34246590fac9c91c661c7a36423e4f88",
+    "revision": "8e2d42ae112eee88aeb212b2c0fc7d08",
     "url": "/ok-wpa-maps/index.html"
   },
   {
-    "revision": "3e7eda5b734ce821a4f1",
-    "url": "/ok-wpa-maps/static/css/main.3d02a32c.chunk.css"
+    "revision": "893dcb81fdd266a1ba6d",
+    "url": "/ok-wpa-maps/static/css/main.cefac71a.chunk.css"
   },
   {
-    "revision": "9f8a72a211cf991ba283",
-    "url": "/ok-wpa-maps/static/js/2.22a75ad4.chunk.js"
+    "revision": "c4b0db4cfed6aa51659e",
+    "url": "/ok-wpa-maps/static/js/2.607ae4d3.chunk.js"
   },
   {
     "revision": "bbb6d2ef0343ff263dae4a282c076fd8",
-    "url": "/ok-wpa-maps/static/js/2.22a75ad4.chunk.js.LICENSE.txt"
+    "url": "/ok-wpa-maps/static/js/2.607ae4d3.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "3e7eda5b734ce821a4f1",
-    "url": "/ok-wpa-maps/static/js/main.7d393802.chunk.js"
+    "revision": "893dcb81fdd266a1ba6d",
+    "url": "/ok-wpa-maps/static/js/main.bbc9f31f.chunk.js"
   },
   {
     "revision": "4a81045370226f30b0da",
