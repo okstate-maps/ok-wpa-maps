@@ -1,8 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
-import { loadModules } from 'esri-loader';
+
+//import { loadModules } from 'esri-loader';
+import OAuthInfo from '@arcgis/core/identity/OAuthInfo';
+import esriId from "@arcgis/core/identity/IdentityManager";
+import FeatureLayer from '@arcgis/core/layers/FeatureLayer';
+import Portal from '@arcgis/core/portal/Portal';
 import { IntroJoyride } from './IntroJoyride';
 import { WebMapView } from './WebMapView';
+
+//loadModules(['@arcgis/core//identity/OAuthInfo','@arcgis/core/identity/IdentityManager',
+//'@arcgis/core/layers/FeatureLayer', '@arcgis/core/portal/Portal'], { css: true })
+//.then(([OAuthInfo, esriId, FeatureLayer, Portal]) => {
 
 //import { loadScript, loadModules } from 'esri-loader';
 import "@esri/calcite-components";
@@ -54,7 +63,6 @@ function App() {
   const [creatorCount, setCreatorCount] = useState(false);
   const [creds, setCreds] = useState(false);
   const [userName, setUserName] = useState(false);
-  const [esriId, setEsriId] = useState(false);
   const [info, setInfo] = useState(false);
 
   var listOfRandomPraise= [
@@ -86,23 +94,19 @@ function App() {
   function closeModal(){
     setIsOpen(false);
   }
-
   useEffect(() => {
-    loadModules(['esri/identity/OAuthInfo','esri/identity/IdentityManager',
-                 'esri/layers/FeatureLayer', 'esri/portal/Portal'], { css: true })
-    .then(([OAuthInfo, esriId, FeatureLayer, Portal]) => {
-    
-      var info = new OAuthInfo({
+      let oauth_info = new OAuthInfo({
           appId: 'l3OWRmRCGfkAN4Dh', //your app id goes here
           popup: false
       });
       
-      setInfo(info);
-      setEsriId(esriId);
-      esriId.registerOAuthInfos([info]);
+      setInfo(oauth_info);
 
+
+      esriId.registerOAuthInfos([oauth_info]);
 
       let hash = parseHashArgs();
+
       if ("access_token" in hash) {
         let token = hash.access_token;
         let un = hash.username;
@@ -113,14 +117,14 @@ function App() {
           expires: exp,
           server: "https://www.arcgis.com/sharing/rest"
         });
-        esriId.getCredential(info.portalUrl + '/sharing');;
+        esriId.getCredential(oauth_info.portalUrl + '/sharing');;
       }
       
       esriId
-        .checkSignInStatus(info.portalUrl + '/sharing')
+        .checkSignInStatus(oauth_info.portalUrl + '/sharing')
         .then((creds) => {
           setCreds(creds);
-          var portal = new Portal(info.portalUrl).load().then((p) => {
+          var portal = new Portal(oauth_info.portalUrl).load().then((p) => {
             setUserName(p.user.fullName);
           });
 
@@ -150,13 +154,11 @@ function App() {
           //esriId.getCredential(info.portalUrl + '/sharing')
         });
 
-      
-   });
-
-  }, []);
-    
+      }, []);
+   
 
     return (
+
       <div className="App">
         <IntroJoyride runIntro={runIntro}
                       toggleIntro={toggleIntro} 
@@ -177,15 +179,15 @@ function App() {
             <h1>Oklahoma 1936 Land Ownership Map Transcription</h1>
             
             <div className='flex-row'>
-              <button tabindex="0" className='drawShapes' onClick={() => {toggleWelcomeScreen(false); setWorkflow('create')}}>
+              <button tabIndex="0" className='drawShapes' onClick={() => {toggleWelcomeScreen(false); setWorkflow('create')}}>
                   <calcite-icon scale='l' class="big-icon" icon="addInNew"></calcite-icon> 
                   <br/>Draw some shapes
               </button>
-              <button tabindex="0" className='reviewShapes' onClick={() => {toggleWelcomeScreen(false); setWorkflow('update')}}>
+              <button tabIndex="0" className='reviewShapes' onClick={() => {toggleWelcomeScreen(false); setWorkflow('update')}}>
                   <calcite-icon scale='l' class="big-icon" icon="editAttributes"></calcite-icon> 
                   <br/>Review existing shapes
               </button>
-              <button tabindex="0" onClick={() => {toggleIntro(!runIntro)}}>
+              <button tabIndex="0" onClick={() => {toggleIntro(!runIntro)}}>
                   <calcite-icon scale='l' class="big-icon" icon="question"></calcite-icon> 
                   <br/>View the intro
               </button>
@@ -196,12 +198,12 @@ function App() {
               <h2>Track your progress:</h2>
               <div className='flex-row'>
                 <br/><br/>
-                <button tabindex="0" className='signInOut' onClick={function(){esriId.getCredential(info.portalUrl + '/sharing')
+                <button tabIndex="0" className='signInOut' onClick={function(){esriId.getCredential(info.portalUrl + '/sharing')
                   .then((credential) => {setCreds(credential);})}}>
                   <calcite-icon scale='l' className="big-icon" icon="sign-in"></calcite-icon> 
                 <br/> Sign in</button>
 
-                <a tabindex="0" href={signUpUrl}><button className='createAccount'>
+                <a tabIndex="0" href={signUpUrl}><button className='createAccount'>
                   <calcite-icon scale='l' className="big-icon" icon="user-plus"></calcite-icon> 
                 <br/> Create an account</button></a>
               </div> 

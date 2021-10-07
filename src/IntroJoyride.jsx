@@ -34,7 +34,12 @@ export function IntroJoyride(props) {
       content: 
       <div>
         <h1>Review existing entries</h1>
-        <h3>If you don't see any errors, click <strong><calcite-icon scale='s' icon="check"></calcite-icon>Looks Good!</strong></h3>
+        <h3>If you don't see any errors, click 
+          <strong>
+            <calcite-icon scale='s' icon="check"></calcite-icon>
+            Looks Good!
+          </strong>
+        </h3>
         <div className='imgContainer'>
           <img alt='Reviewing parcels' 
                src={process.env.PUBLIC_URL + '/img/wpa7.gif'}/>
@@ -49,7 +54,12 @@ export function IntroJoyride(props) {
       content: 
       <div>
         <h1>Review existing entries</h1>
-        <h3>If you see something incorrect or missing, click <strong><calcite-icon scale='s' icon="pencil"></calcite-icon>Edit feature</strong></h3>
+        <h3>If you see something incorrect or missing, click 
+          <strong>
+            <calcite-icon scale='s' icon="pencil"></calcite-icon>
+            Edit feature
+          </strong>
+        </h3>
         <div className='imgContainer'>
           <img alt='Reviewing parcels' 
                src={process.env.PUBLIC_URL + '/img/wpa8.gif'}/>

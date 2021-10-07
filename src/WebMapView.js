@@ -1,6 +1,18 @@
 import React from 'react';
+import ReactGA from "react-ga4";
+import ArcGISMap from '@arcgis/core/Map';
+import Basemap from '@arcgis/core/Basemap';
+import MapView from '@arcgis/core/views/MapView';
+import FeatureLayer from '@arcgis/core/layers/FeatureLayer';
+//import FeatureLayerView from '@arcgis/core/views/layers/FeatureLayerView';
+import TileLayer from '@arcgis/core/layers/TileLayer';
+import Compass from '@arcgis/core/widgets/Compass';
+import Editor from '@arcgis/core/widgets/Editor';
+//import Sketch from '@arcgis/core/widgets/Sketch';
+import Graphic from '@arcgis/core/Graphic';
+//import DistanceMeasurement2D from '@arcgis/core/widgets/DistanceMeasurement2D';
+import * as watchUtils from "@arcgis/core/core/watchUtils";
 import {CreateFormTemplate, ReviewFormTemplate} from './FormTemplates';
-import { loadModules } from 'esri-loader';
 import {ReactComponent as LoadIndicator} from './loader.svg';
 
 function getRandomInt(max) {
@@ -115,23 +127,6 @@ export class WebMapView extends React.Component {
 }
 
 componentDidMount() {
-    // lazy load the required ArcGIS API for JavaScript modules and CSS
-    loadModules(['esri/Map', 'esri/Basemap', 
-     'esri/views/MapView', 
-     'esri/layers/FeatureLayer',
-     'esri/views/layers/FeatureLayerView',
-     'esri/layers/TileLayer',
-     'esri/widgets/Compass',
-     'esri/widgets/Editor',
-     'esri/widgets/Sketch',
-     'esri/Graphic',
-                 //'esri/widgets/DistanceMeasurement2D'
-                 'esri/core/watchUtils'], { css: true })
-    .then(([ArcGISMap, Basemap, MapView, FeatureLayer, 
-      FeatureLayerView, TileLayer, Compass, Editor, Sketch, Graphic,
-            //DistanceMeasurement2D,
-            watchUtils]) => {
-
       this.graphic = Graphic;
 
       let featureTileLayer = new TileLayer({
@@ -219,11 +214,21 @@ componentDidMount() {
         }
         if (e.addedFeatures.length > 0) {
           let addedFeatureId = e.addedFeatures[0].objectId;
-          let addedFeature = this.featureVectorLayer.queryFeatures({objectIds: [addedFeatureId],
+          this.featureVectorLayer.queryFeatures({objectIds: [addedFeatureId],
             outFields: ['OBJECTID','CREATOR_PUBLIC']}).then(
             (feats) => {feats.features[0].setAttribute('CREATOR_PUBLIC', this.props.creds.userId);
             let edits = {updateFeatures: [feats.features[0]]}
             this.featureVectorLayer.applyEdits(edits);});
+            ReactGA.event('wpa_transcript_create'
+           //  {
+             //  category: "your category",
+              // action: "your action",
+            //   label: "your label", // optional
+            //   value: 99, // optional, must be a number
+            //   nonInteraction: true, // optional, true/false
+            //   transport: "xhr", // optional, beacon/xhr/image
+            // }
+            );
 
           }
         } );
@@ -332,7 +337,7 @@ componentDidMount() {
       }
 
       this.map.add(this.featureVectorLayer);
-    });
+    
 }
 
 updateTimesChecked() {

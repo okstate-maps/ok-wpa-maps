@@ -19,6 +19,7 @@ export const CreateFormTemplate = {
               {
                 type: 'field',
                 fieldName: 'OwnerLastName',
+                id: 'HITHEREIMTHEID',
                 label: 'Owner\'s Last Name (if an individual)'
               },
 

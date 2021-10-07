@@ -1,8 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import ReactGA from "react-ga4";
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
+
+ReactGA.initialize('G-EQMR17KKJG');
+ReactGA.send("pageview");
 
 ReactDOM.render(
   <React.StrictMode>

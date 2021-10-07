@@ -4,19 +4,24 @@
   "private": true,
   "homepage": "https://okstate-maps.github.io/ok-wpa-maps",
   "dependencies": {
-    "@arcgis/core": "^4.20.2",
+    "@arcgis/core": "^4.21.0",
     "@esri/calcite-components": "^1.0.0-beta.63",
     "@esri/calcite-ui-icons": "^3.10.0",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
+    "@types/arcgis-js-api": "^4.21.0",
     "esri-loader": "^3.2.0",
     "gh-pages": "^3.1.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-ga4": "^1.1.1",
     "react-joyride": "^2.2.1",
     "react-modal": "^3.11.2",
-    "react-scripts": "3.4.3"
+    "react-scripts": "3.4.3",
+    "tsc": "^2.0.3",
+    "tslib": "^2.3.1",
+    "typescript": "^4.4.3"
   },
   "scripts": {
     "predeploy": "npm run build",
