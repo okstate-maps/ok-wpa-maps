@@ -12,7 +12,7 @@ const thisLooksOkAction = {
 
 export const CreateFormTemplate = {
         title: 'Land Info',
-        elements: [{ // Autocasts to new GroupElement
+        elements: [{ 
           type: 'group',
           label: 'Owner Information',
           elements: [
@@ -36,7 +36,7 @@ export const CreateFormTemplate = {
           ]
         },
 
-        { // Autocasts to new GroupElement
+        { 
           type: 'group',
           label: 'Land and Improvement Valuation',
           elements: [

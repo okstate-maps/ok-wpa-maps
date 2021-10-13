@@ -219,15 +219,15 @@ componentDidMount() {
             (feats) => {feats.features[0].setAttribute('CREATOR_PUBLIC', this.props.creds.userId);
             let edits = {updateFeatures: [feats.features[0]]}
             this.featureVectorLayer.applyEdits(edits);});
-            ReactGA.event('wpa_transcript_create'
-           //  {
-             //  category: "your category",
-              // action: "your action",
-            //   label: "your label", // optional
-            //   value: 99, // optional, must be a number
-            //   nonInteraction: true, // optional, true/false
-            //   transport: "xhr", // optional, beacon/xhr/image
-            // }
+            ReactGA.event('wpa_transcript_create',
+              {
+                category: "TRANSCRIPTION",
+                action: "SUBMIT_NEW_RECORD"
+              //   label: "your label", // optional
+              //   value: 99, // optional, must be a number
+              //   nonInteraction: true, // optional, true/false
+              //   transport: "xhr", // optional, beacon/xhr/image
+              }
             );
 
           }

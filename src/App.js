@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ReactGA from "react-ga4";
 import Modal from 'react-modal';
 
 //import { loadModules } from 'esri-loader';
@@ -179,15 +180,18 @@ function App() {
             <h1>Oklahoma 1936 Land Ownership Map Transcription</h1>
             
             <div className='flex-row'>
-              <button tabIndex="0" className='drawShapes' onClick={() => {toggleWelcomeScreen(false); setWorkflow('create')}}>
+              <button tabIndex="0" className='drawShapes' onClick={() => {ReactGA.event('wpa_transcript_create',{'category': 'TRANSCRIPTION', 'action':'INITIATE_CREATE_WORKFLOW'});
+                  toggleWelcomeScreen(false); setWorkflow('create')}}>
                   <calcite-icon scale='l' class="big-icon" icon="addInNew"></calcite-icon> 
                   <br/>Draw some shapes
               </button>
-              <button tabIndex="0" className='reviewShapes' onClick={() => {toggleWelcomeScreen(false); setWorkflow('update')}}>
+              <button tabIndex="0" className='reviewShapes' onClick={() => {ReactGA.event('wpa_transcript_create',{'category': 'TRANSCRIPTION', 'action':'INITIATE_REVIEW_WORKFLOW'});
+                  toggleWelcomeScreen(false); setWorkflow('update')}}>
                   <calcite-icon scale='l' class="big-icon" icon="editAttributes"></calcite-icon> 
                   <br/>Review existing shapes
               </button>
-              <button tabIndex="0" onClick={() => {toggleIntro(!runIntro)}}>
+              <button tabIndex="0" onClick={() => {ReactGA.event('tutorial_begin',{'category': 'INTRO', 'action':'INTRO_TOGGLE'});
+                  toggleIntro(!runIntro)}}>
                   <calcite-icon scale='l' class="big-icon" icon="question"></calcite-icon> 
                   <br/>View the intro
               </button>
@@ -198,12 +202,14 @@ function App() {
               <h2>Track your progress:</h2>
               <div className='flex-row'>
                 <br/><br/>
-                <button tabIndex="0" className='signInOut' onClick={function(){esriId.getCredential(info.portalUrl + '/sharing')
+                <button tabIndex="0" className='signInOut' onClick={function(){
+                    ReactGA.event('login',{'category': 'TRANSCRIPTION', 'action':'login'}); 
+                    esriId.getCredential(info.portalUrl + '/sharing')
                   .then((credential) => {setCreds(credential);})}}>
                   <calcite-icon scale='l' className="big-icon" icon="sign-in"></calcite-icon> 
                 <br/> Sign in</button>
 
-                <a tabIndex="0" href={signUpUrl}><button className='createAccount'>
+                <a tabIndex="0" href={signUpUrl}><button onClick={function(){ ReactGA.event('sign_up',{'category': 'SIGN_UP','action': 'SIGN_UP'})}} className='createAccount'>
                   <calcite-icon scale='l' className="big-icon" icon="user-plus"></calcite-icon> 
                 <br/> Create an account</button></a>
               </div> 
