@@ -12,6 +12,7 @@ import Editor from '@arcgis/core/widgets/Editor';
 import Graphic from '@arcgis/core/Graphic';
 //import DistanceMeasurement2D from '@arcgis/core/widgets/DistanceMeasurement2D';
 import * as watchUtils from "@arcgis/core/core/watchUtils";
+import * as geodesicUtils from "@arcgis/core/geometry/support/geodesicUtils";
 import {CreateFormTemplate, ReviewFormTemplate} from './FormTemplates';
 import {ReactComponent as LoadIndicator} from './loader.svg';
 
@@ -214,11 +215,22 @@ componentDidMount() {
         }
         if (e.addedFeatures.length > 0) {
           let addedFeatureId = e.addedFeatures[0].objectId;
-          this.featureVectorLayer.queryFeatures({objectIds: [addedFeatureId],
-            outFields: ['OBJECTID','CREATOR_PUBLIC']}).then(
-            (feats) => {feats.features[0].setAttribute('CREATOR_PUBLIC', this.props.creds.userId);
-            let edits = {updateFeatures: [feats.features[0]]}
-            this.featureVectorLayer.applyEdits(edits);});
+          this.featureVectorLayer.queryFeatures({
+              objectIds: [addedFeatureId],
+              returnGeometry: true,
+              outSpatialReference: {wkid:4326},
+              outFields: ['OBJECTID','CREATOR_PUBLIC','acreage']
+            }).then(
+              (feats) => {
+                feats.features[0].setAttribute('CREATOR_PUBLIC', this.props.creds.userId);
+              
+                let acres = geodesicUtils.geodesicAreas([feats.features[0].geometry], "acres");
+                
+                feats.features[0].setAttribute('acreage', acres[0]);
+                let edits = {updateFeatures: [feats.features[0]]}
+                this.featureVectorLayer.applyEdits(edits);
+              }
+            );
             ReactGA.event('wpa_transcript_create',
               {
                 category: "TRANSCRIPTION",
@@ -402,7 +414,7 @@ sayThanks() {
   this.props.openModal();
   setTimeout(function(){
     that.props.closeModal(); 
-  }, 2000);
+  }, 1500);
   this.toggleLoadIndicator(false);
   this.highlightedFeature.remove();
   this.getRandomFeatureForReview();
