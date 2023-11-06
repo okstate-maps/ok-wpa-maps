@@ -101,10 +101,14 @@ div.App button div.esri-icon-sketch-rectangle:before {
    font-family: 'CalciteWebCoreIcons' !important;
 }
 
-div.App div.bigIcon {
-  font-size:3em;
+svg.icon {
+  width: 32px;
 }
 
+svg.small-icon {
+  width: 18px;
+  padding-right: 2px;
+}
 
 .svg-loader{
   width:150px;

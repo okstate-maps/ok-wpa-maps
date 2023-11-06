@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { ReactComponent as PencilIcon} from "./svg/pencil-16.svg";
+import { ReactComponent as CheckIcon} from "./svg/check-16.svg";
 import Joyride, { CallBackProps, STATUS, Step, StoreHelpers } from 'react-joyride';
 export function IntroJoyride(props) {
 	const [steps, setSteps] = useState([
@@ -34,9 +36,9 @@ export function IntroJoyride(props) {
       content: 
       <div>
         <h1>Review existing entries</h1>
-        <h3>If you don't see any errors, click 
+        <h3>If you don't see any errors, click &nbsp;
           <strong>
-            <calcite-icon scale='s' icon="check"></calcite-icon>
+            <CheckIcon className="small-icon"/>
             Looks Good!
           </strong>
         </h3>
@@ -54,9 +56,9 @@ export function IntroJoyride(props) {
       content: 
       <div>
         <h1>Review existing entries</h1>
-        <h3>If you see something incorrect or missing, click 
+        <h3>If you see something incorrect or missing, click &nbsp;
           <strong>
-            <calcite-icon scale='s' icon="pencil"></calcite-icon>
+          <PencilIcon className="small-icon"/>
             Edit feature
           </strong>
         </h3>

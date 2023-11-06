@@ -13,9 +13,16 @@ import { WebMapView } from './WebMapView';
 //loadModules(['@arcgis/core//identity/OAuthInfo','@arcgis/core/identity/IdentityManager',
 //'@arcgis/core/layers/FeatureLayer', '@arcgis/core/portal/Portal'], { css: true })
 //.then(([OAuthInfo, esriId, FeatureLayer, Portal]) => {
-
 //import { loadScript, loadModules } from 'esri-loader';
-import "@esri/calcite-components";
+//import "@esri/calcite-components";
+//import "@esri/calcite-components/dist/calcite/calcite.css";
+import { ReactComponent as QuestionIcon} from "./svg/question-32.svg";
+import { ReactComponent as AddInNewIcon} from "./svg/add-in-new-32.svg";
+import { ReactComponent as EditAttributesIcon} from "./svg/edit-attributes-32.svg";
+import { ReactComponent as SignInIcon} from "./svg/sign-in-32.svg";
+import { ReactComponent as SignOutIcon} from "./svg/sign-out-32.svg";
+import { ReactComponent as UserPlusIcon} from "./svg/edit-attributes-32.svg";
+
 import './App.css';
 
 const config = {
@@ -103,7 +110,6 @@ function App() {
       
       setInfo(oauth_info);
 
-
       esriId.registerOAuthInfos([oauth_info]);
 
       let hash = parseHashArgs();
@@ -131,7 +137,7 @@ function App() {
 
 
           var layer =  new FeatureLayer({
-            url: 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Maps_Land_Parcels_Public/FeatureServer/0'
+            url: 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Maps_Land_Parcels_Osage/FeatureServer/0'
           });
           var q = layer.createQuery();
           q.where = 'CREATOR_PUBLIC = \'' + creds.userId + '\'';
@@ -181,18 +187,18 @@ function App() {
             
             <div className='flex-row'>
               <button tabIndex="0" className='drawShapes' onClick={() => {ReactGA.event('wpa_transcript_create',{'category': 'TRANSCRIPTION', 'action':'INITIATE_CREATE_WORKFLOW'});
-                  toggleWelcomeScreen(false); setWorkflow('create')}}>
-                  <calcite-icon scale='l' class="big-icon" icon="addInNew"></calcite-icon> 
+                  toggleWelcomeScreen(false); setWorkflow('create-features')}}>
+                    <AddInNewIcon className="icon"/>
                   <br/>Draw some shapes
               </button>
               <button tabIndex="0" className='reviewShapes' onClick={() => {ReactGA.event('wpa_transcript_create',{'category': 'TRANSCRIPTION', 'action':'INITIATE_REVIEW_WORKFLOW'});
                   toggleWelcomeScreen(false); setWorkflow('update')}}>
-                  <calcite-icon scale='l' class="big-icon" icon="editAttributes"></calcite-icon> 
+                    <EditAttributesIcon className="icon"/>
                   <br/>Review existing shapes
               </button>
               <button tabIndex="0" onClick={() => {ReactGA.event('tutorial_begin',{'category': 'INTRO', 'action':'INTRO_TOGGLE'});
                   toggleIntro(!runIntro)}}>
-                  <calcite-icon scale='l' class="big-icon" icon="question"></calcite-icon> 
+                    <QuestionIcon className="icon"/>
                   <br/>View the intro
               </button>
             </div>
@@ -206,11 +212,11 @@ function App() {
                     ReactGA.event('login',{'category': 'TRANSCRIPTION', 'action':'login'}); 
                     esriId.getCredential(info.portalUrl + '/sharing')
                   .then((credential) => {setCreds(credential);})}}>
-                  <calcite-icon scale='l' className="big-icon" icon="sign-in"></calcite-icon> 
+                  <SignInIcon className="icon"/>
                 <br/> Sign in</button>
 
                 <a tabIndex="0" href={signUpUrl}><button onClick={function(){ ReactGA.event('sign_up',{'category': 'SIGN_UP','action': 'SIGN_UP'})}} className='createAccount'>
-                  <calcite-icon scale='l' className="big-icon" icon="user-plus"></calcite-icon> 
+                <UserPlusIcon className="icon"/>
                 <br/> Create an account</button></a>
               </div> 
             </div>
@@ -222,8 +228,9 @@ function App() {
                     {creatorCount === 1 ? 'shape' : 'shapes'}. {creatorCount > 0 ? randomPraise : ''}
                 </h3>
                 <br/><button className='signInOut' onClick={function(){creds.destroy(); window.location = window.location.pathname}}>
-                   <calcite-icon scale='l' class="big-icon" icon="sign-out"></calcite-icon> <br/> Click to sign out
-                  </button>
+                      <SignOutIcon className="icon"/>
+                      <br/> Sign out
+                    </button>
               </div>
             }
         

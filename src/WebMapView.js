@@ -6,14 +6,16 @@ import MapView from '@arcgis/core/views/MapView';
 import FeatureLayer from '@arcgis/core/layers/FeatureLayer';
 //import FeatureLayerView from '@arcgis/core/views/layers/FeatureLayerView';
 import TileLayer from '@arcgis/core/layers/TileLayer';
+//import VectorTileLayer from '@arcgis/core/layers/VectorTileLayer';
 import Compass from '@arcgis/core/widgets/Compass';
 import Editor from '@arcgis/core/widgets/Editor';
+import Popup from "@arcgis/core/widgets/Popup.js";
 //import Sketch from '@arcgis/core/widgets/Sketch';
 import Graphic from '@arcgis/core/Graphic';
 //import DistanceMeasurement2D from '@arcgis/core/widgets/DistanceMeasurement2D';
-import * as watchUtils from "@arcgis/core/core/watchUtils";
+import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
 import * as geodesicUtils from "@arcgis/core/geometry/support/geodesicUtils";
-import {CreateFormTemplate, ReviewFormTemplate} from './FormTemplates';
+import {CreateFormTemplate, ReviewFormTemplate, ThankYouTemplate} from './FormTemplates';
 import {ReactComponent as LoadIndicator} from './loader.svg';
 
 function getRandomInt(max) {
@@ -25,11 +27,15 @@ export class WebMapView extends React.Component {
     super(props);
 
     //TODO move these URLs into a separate file
-    this.featureTileUrl = 'https://tiles.arcgis.com/tiles/jWQlP64OuwDh6GGX/arcgis/rest/services/_wpa_all_6Aug2020/MapServer';
-    this.featureVectorUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Maps_Land_Parcels_Public/FeatureServer/0';
-    this.backgroundFeatureUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/ArcGIS/rest/services/Oklahoma_Public_Land_Survey_Sections/FeatureServer/0';
+    //this.featureTileUrl = 'https://tiles.arcgis.com/tiles/jWQlP64OuwDh6GGX/arcgis/rest/services/_wpa_all_6Aug2020/MapServer';
+    this.featureTileUrl = 'https://tiles.arcgis.com/tiles/jWQlP64OuwDh6GGX/arcgis/rest/services/osage_cache3/MapServer';
+    //this.featureVectorUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Maps_Land_Parcels_Public/FeatureServer/0';
+    this.featureVectorUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Maps_Land_Parcels_Osage/FeatureServer/0';
+    this.featureVectorTileUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Maps_Land_Parcels_Vector_Tile/MapServer';
+    //this.backgroundFeatureUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/ArcGIS/rest/services/Oklahoma_Public_Land_Survey_Sections/FeatureServer/0';
+    this.backgroundFeatureUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/PLSSFirstDivis_Osage/FeatureServer/0';
     this.reviewerTableUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Reviewers/FeatureServer/0';
-
+    
     this.mapRef = React.createRef();
     this.workflow = props.workflow;
     this.editThis = this.editThis.bind(this);
@@ -121,11 +127,11 @@ export class WebMapView extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if (prevState.backgroundFeatureObjectIds === null &&
-      this.state.backgroundFeatureObjectIds !== null) {
-      this.getRandomBackgroundFeature();
+  //   if (prevState.backgroundFeatureObjectIds === null &&
+  //     this.state.backgroundFeatureObjectIds !== null) {
+  //     this.getRandomBackgroundFeature();
+   //}
   }
-}
 
 componentDidMount() {
       this.graphic = Graphic;
@@ -134,6 +140,8 @@ componentDidMount() {
         url: this.featureTileUrl
       });
       
+      //let featureVectorTileLayer = new VectorTileLayer(this.featureVectorTileUrl);
+
       this.map = new ArcGISMap({
         basemap: new Basemap({baseLayers:[featureTileLayer]})
       });
@@ -147,10 +155,11 @@ componentDidMount() {
         container: this.mapRef.current,
         map: this.map,
         highlightOptions: {
-          color: '#fe5c00',
-          fillOpacity: 0.1
+          color: [255, 255,255, 1],
+          haloOpacity:1,
+          fillOpacity: 0.3
         },
-        popup: {
+        popup: new Popup({
           dockEnabled: true,
           dockOptions: {
             // Disables the dock button from the popup
@@ -158,7 +167,7 @@ componentDidMount() {
             // Ignore the default sizes that trigger responsive docking
             breakpoint: false
           }
-        }
+        })
       });
 
       this.compass = new Compass({
@@ -170,13 +179,13 @@ componentDidMount() {
 
       var refreshButton = document.createElement('div');
       refreshButton.className = 'esri-icon-refresh esri-widget--button esri-widget esri-interactive ';
-      refreshButton.title = this.workflow === 'create' ? 
-      'Go to another random location.' : 
-      'Get another entry to review.';
+      refreshButton.title = this.workflow === 'create-features' ? 
+        'Go to another random location.' : 
+        'Get another entry to review.';
       
       refreshButton.addEventListener('click', () => {
         switch (this.workflow) {
-          case 'create': 
+          case 'create-features': 
           this.getRandomBackgroundFeature();
           break;
           case 'update':
@@ -187,7 +196,7 @@ componentDidMount() {
         }
       });
 
-      this.view.ui.add(refreshButton, 'bottom-left');
+      //this.view.ui.add(refreshButton, 'bottom-left');
 
       //measurement widget, but let's not use it for now
       
@@ -198,36 +207,62 @@ componentDidMount() {
       // });
       //this.view.ui.add(this.measurement, 'bottom-left');
          
-
       this.featureVectorLayer = new FeatureLayer({
         url: this.featureVectorUrl,
+        renderer:  {
+          type: "simple",  // autocasts as new SimpleRenderer()
+          symbol: {
+            type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
+            color: [255,0,0,0.2],
+            outline: {  // autocasts as new SimpleLineSymbol()
+              width: 1,
+              color: "red"
+            }
+          }
+        },
+        //definitionExpression
         popupTemplate: ReviewFormTemplate,
         formTemplate: CreateFormTemplate,
         groupDisplay: 'sequential'
       });
 
-      
       this.featureVectorLayer.on('edits', (e) => {
         if (e.updatedFeatures.length > 0 && this.highlightedFeature) {
-          this.incrementReviewerCount();
+          this.incrementReviewerCount(e.updatedFeatures.length);
           this.sayThanks();
           this.view.ui.remove(this.editor);
         }
         if (e.addedFeatures.length > 0) {
-          let addedFeatureId = e.addedFeatures[0].objectId;
+
+          let addedFeatureIds = e.addedFeatures.map(x => x.objectId);
+          console.log(addedFeatureIds);
           this.featureVectorLayer.queryFeatures({
-              objectIds: [addedFeatureId],
+              objectIds: addedFeatureIds,
               returnGeometry: true,
               outSpatialReference: {wkid:4326},
-              outFields: ['OBJECTID','CREATOR_PUBLIC','acreage']
+              outFields: ['OBJECTID',
+                          'CREATOR_PUBLIC',
+                          'acreage',
+                          'OwnerFirstNameAndMI',
+                          'OwnerLastName',
+                           'OwnerOrgName',
+                          'LandValue',
+                          'ImprovementsValue2']
             }).then(
-              (feats) => {
-                feats.features[0].setAttribute('CREATOR_PUBLIC', this.props.creds.userId);
-              
-                let acres = geodesicUtils.geodesicAreas([feats.features[0].geometry], "acres");
-                
-                feats.features[0].setAttribute('acreage', acres[0]);
-                let edits = {updateFeatures: [feats.features[0]]}
+              (fs) => {
+                let feats = fs.features;
+
+                feats.forEach((x) => {
+                  x.setAttribute(
+                  'CREATOR_PUBLIC', 
+                  this.props.creds.userId
+                  );
+                  let acres = geodesicUtils.geodesicAreas([x.geometry], "acres");
+                  x.setAttribute('acreage', acres[0]);
+                }
+                );
+            
+                let edits = {updateFeatures: feats};
                 this.featureVectorLayer.applyEdits(edits);
               }
             );
@@ -258,7 +293,8 @@ componentDidMount() {
         layerInfos: [{
           view: this.view,
           layer: this.featureVectorLayer,
-          allowAttachments: false,
+          attachmentsOnCreateEnabled: false,
+          attachmentsOnUpdateEnabled: false,
           deleteEnabled: false
         }],
         supportingWidgetDefaults: {
@@ -269,20 +305,26 @@ componentDidMount() {
         
       });
      
+      
       // I can't believe this is the only way to override widget labelling, but here we are
       this.editor.postInitialize = function(){
-        watchUtils.init(this,'messages', (messages) => {
-          messages.widgetLabel = 'WPA Maps';
-          messages.addFeature = 'Draw a new shape';
-          messages.editFeature = 'Review an existing record';
-        });
+        //reactiveUtils.watch(()=>this.messages, (messages) => {
+          console.log(this);
+          window.editor_widget = this;
+          this.messages.widgetLabel = 'WPA Maps';
+          this.messages.createFeatures = 'Draw new shapes';
+          this.messages.editFeature = 'Review an existing record';
+        //});
       };
 
       //prepopulate fields after done sketching shape
       this.editor.viewModel.sketchViewModel.on('create', 
-        function(e){
+        function(e){        
           if (e.state === "complete"){
-            e.graphic.attributes= {"TaxExempt":"No"};
+            console.log(e.graphic.attributes);
+            e.graphic.attributes["TaxExempt"]= "No";
+            console.log(e.graphic.attributes);
+            
           }
 
         }
@@ -313,8 +355,11 @@ componentDidMount() {
         }
       );
 
-      // Event handler that fires each time an action is clicked
       
+      //this.editor.viewModel.featureFormViewModel.on("value-change", function(e){console.log("value-change")});
+      
+
+      // Event handler that fires each time an action is clicked
       this.view.popup.on('trigger-action', function (event) {
         if (event.action.id === 'edit-this') {
           that.editThis();
@@ -327,17 +372,32 @@ componentDidMount() {
       });       
 
       // for creation, pick a random background feature and zoom to it
-      if (this.workflow === 'create') {
+      // if (this.workflow === 'create') {
     
-        this.backgroundFeatureLayer.queryObjectIds()
-          .then((oids) => {
-            that.setState({"backgroundFeatureObjectIds": oids});
-            that.map.add(this.backgroundFeatureLayer);
-          });
+      //   this.backgroundFeatureLayer.queryObjectIds()
+      //     .then((oids) => {
+      //       that.setState({"backgroundFeatureObjectIds": oids});
+      //       that.map.add(this.backgroundFeatureLayer);
+      //     });
+
+      //   this.featureVectorLayer.popupEnabled = false;
+      //   this.view.ui.add(this.editor, 'bottom-right');
+      // }
+
+      // for creation, pick a random background feature and zoom to it
+      if (this.workflow === 'create-features') {
+    
+        // this.backgroundFeatureLayer.queryObjectIds()
+        //   .then((oids) => {
+        //     that.setState({"backgroundFeatureObjectIds": oids});
+        //     that.map.add(this.backgroundFeatureLayer);
+        //   });
 
         this.featureVectorLayer.popupEnabled = false;
         this.view.ui.add(this.editor, 'bottom-right');
       }
+
+      
 
       // for reviewing, pick a random polygon and zoom to it
       if (this.workflow === 'update') {
@@ -348,7 +408,7 @@ componentDidMount() {
         this.reviewWorkflow();
       }
 
-      this.map.add(this.featureVectorLayer);
+        this.map.add(this.featureVectorLayer);
     
 }
 
@@ -405,12 +465,7 @@ sayThanks() {
   var that = this;
 
   //TODO move this to a separate template
-  this.props.setModalContent(
-    <div>
-    <h1>Thank you!</h1>
-    <p>Here's another entry to check.</p>
-    </div>
-    );
+  this.props.setModalContent(ThankYouTemplate);
   this.props.openModal();
   setTimeout(function(){
     that.props.closeModal(); 
