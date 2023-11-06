@@ -1,3 +1,6 @@
+import React from 'react';
+
+
 const editThisAction = {
     title: 'Edit feature',
     id: 'edit-this',
@@ -54,7 +57,7 @@ export const CreateFormTemplate = {
         },
            {
                 type: 'field',
-                fieldName: 'TaxExempt',
+                fieldName: 'TaxExempt2',
                 label: 'Marked with an X?'
               }
         ]
@@ -62,7 +65,7 @@ export const CreateFormTemplate = {
 
 
 export const ReviewFormTemplate = {
-    title: 'Please doublecheck the info below.',
+    title: 'Please doublecheck this information.',
     content: [
       {
         type: 'fields',
@@ -98,7 +101,13 @@ export const ReviewFormTemplate = {
     //overwriteActions: true,
     actions: [thisLooksOkAction, editThisAction]
 }
-
+ export const ThankYouTemplate =
+    <>     
+      <div>
+        <h1>Thank you!</h1>
+        <p>Here's another entry to check.</p>
+      </div>
+    </>;
 
 
 export default CreateFormTemplate;
