@@ -282,6 +282,7 @@ componentDidMount() {
       var that = this;
       this.editor = new Editor({
         view: this.view,
+        visibleElements: {editFeaturesSection: false},
         allowedWorkflows: [this.workflow],
         snappingOptions: {
            enabled: true,
