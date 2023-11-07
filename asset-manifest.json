@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/ok-wpa-maps/static/css/main.bcf625e3.css",
-    "main.js": "/ok-wpa-maps/static/js/main.9c018a5f.js",
+    "main.js": "/ok-wpa-maps/static/js/main.fa4a6ebe.js",
     "static/js/8023.53fec6ab.chunk.js": "/ok-wpa-maps/static/js/8023.53fec6ab.chunk.js",
     "static/js/738.aa3d4f4b.chunk.js": "/ok-wpa-maps/static/js/738.aa3d4f4b.chunk.js",
     "static/js/2224.78cd5763.chunk.js": "/ok-wpa-maps/static/js/2224.78cd5763.chunk.js",
@@ -379,7 +379,7 @@
     "static/media/add-in-new-32.svg": "/ok-wpa-maps/static/media/add-in-new-32.c74be703ae10769d57006284d6b11755.svg",
     "static/media/check-16.svg": "/ok-wpa-maps/static/media/check-16.a2aee629be2f8ea19e0d5aa9e707dee4.svg",
     "main.bcf625e3.css.map": "/ok-wpa-maps/static/css/main.bcf625e3.css.map",
-    "main.9c018a5f.js.map": "/ok-wpa-maps/static/js/main.9c018a5f.js.map",
+    "main.fa4a6ebe.js.map": "/ok-wpa-maps/static/js/main.fa4a6ebe.js.map",
     "8023.53fec6ab.chunk.js.map": "/ok-wpa-maps/static/js/8023.53fec6ab.chunk.js.map",
     "738.aa3d4f4b.chunk.js.map": "/ok-wpa-maps/static/js/738.aa3d4f4b.chunk.js.map",
     "2224.78cd5763.chunk.js.map": "/ok-wpa-maps/static/js/2224.78cd5763.chunk.js.map",
@@ -730,6 +730,6 @@
   },
   "entrypoints": [
     "static/css/main.bcf625e3.css",
-    "static/js/main.9c018a5f.js"
+    "static/js/main.fa4a6ebe.js"
   ]
 }
