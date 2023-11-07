@@ -1,2 +1,0 @@
-(this["webpackJsonpok-wpa-maps"]=this["webpackJsonpok-wpa-maps"]||[]).push([[157],{1062:function(e,t,o){"use strict";o.r(t),o.d(t,"s",(function(){return u}));var s,r,a,p=o(477),c={exports:{}};s=c,r=c.exports,void 0!==(a=function(e,t){Object.defineProperty(t,"__esModule",{value:!0}),t.default={"Zoom Out":"Oddiali\u0165","From %1 to %2":"Z %1 do %2","From %1":"Z %1","To %1":"Do %1"}}(p.a,r))&&(s.exports=a);var n=Object(p.c)(c.exports),u=Object.freeze(Object.assign(Object.create(null),c.exports,{default:n}))}}]);
-//# sourceMappingURL=157.3e9ad63c.chunk.js.map
