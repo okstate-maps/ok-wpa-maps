@@ -57,7 +57,7 @@ export const CreateFormTemplate = {
         },
            {
                 type: 'field',
-                fieldName: 'TaxExempt2',
+                fieldName: 'TaxExempt',
                 label: 'Marked with an X?'
               }
         ]

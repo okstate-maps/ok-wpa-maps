@@ -27,13 +27,13 @@ export class WebMapView extends React.Component {
     super(props);
 
     //TODO move these URLs into a separate file
-    //this.featureTileUrl = 'https://tiles.arcgis.com/tiles/jWQlP64OuwDh6GGX/arcgis/rest/services/_wpa_all_6Aug2020/MapServer';
-    this.featureTileUrl = 'https://tiles.arcgis.com/tiles/jWQlP64OuwDh6GGX/arcgis/rest/services/osage_cache3/MapServer';
-    //this.featureVectorUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Maps_Land_Parcels_Public/FeatureServer/0';
-    this.featureVectorUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Maps_Land_Parcels_Osage/FeatureServer/0';
+    this.featureTileUrl = 'https://tiles.arcgis.com/tiles/jWQlP64OuwDh6GGX/arcgis/rest/services/_wpa_all_6Aug2020/MapServer';
+    //this.featureTileUrl = 'https://tiles.arcgis.com/tiles/jWQlP64OuwDh6GGX/arcgis/rest/services/osage_cache3/MapServer';
+    this.featureVectorUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Maps_Land_Parcels_Public/FeatureServer/0';
+    //this.featureVectorUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Maps_Land_Parcels_Osage/FeatureServer/0';
     this.featureVectorTileUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Maps_Land_Parcels_Vector_Tile/MapServer';
-    //this.backgroundFeatureUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/ArcGIS/rest/services/Oklahoma_Public_Land_Survey_Sections/FeatureServer/0';
-    this.backgroundFeatureUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/PLSSFirstDivis_Osage/FeatureServer/0';
+    this.backgroundFeatureUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/ArcGIS/rest/services/Oklahoma_Public_Land_Survey_Sections/FeatureServer/0';
+    //this.backgroundFeatureUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/PLSSFirstDivis_Osage/FeatureServer/0';
     this.reviewerTableUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Reviewers/FeatureServer/0';
     
     this.mapRef = React.createRef();
@@ -235,7 +235,7 @@ componentDidMount() {
         if (e.addedFeatures.length > 0) {
 
           let addedFeatureIds = e.addedFeatures.map(x => x.objectId);
-          console.log(addedFeatureIds);
+          //console.log(addedFeatureIds);
           this.featureVectorLayer.queryFeatures({
               objectIds: addedFeatureIds,
               returnGeometry: true,
@@ -300,7 +300,7 @@ componentDidMount() {
         }],
         supportingWidgetDefaults: {
           featureForm: {
-            id: 'featureFormKD'
+            id: 'featureForm'
           }
         }
         
@@ -464,8 +464,6 @@ incrementReviewerCount() {
 
 sayThanks() {
   var that = this;
-
-  //TODO move this to a separate template
   this.props.setModalContent(ThankYouTemplate);
   this.props.openModal();
   setTimeout(function(){

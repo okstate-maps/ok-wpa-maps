@@ -137,7 +137,8 @@ function App() {
 
 
           var layer =  new FeatureLayer({
-            url: 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Maps_Land_Parcels_Osage/FeatureServer/0'
+            //url: 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Maps_Land_Parcels_Osage/FeatureServer/0'
+            url: 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Maps_Land_Parcels_Public/FeatureServer/0'
           });
           var q = layer.createQuery();
           q.where = 'CREATOR_PUBLIC = \'' + creds.userId + '\'';
@@ -184,8 +185,10 @@ function App() {
           <>
 
             <h1>Oklahoma 1936 Land Ownership Map Transcription</h1>
+            <h2>Under maintenance.</h2>
             
-            <div className='flex-row'>
+            {/* 
+           <div className='flex-row'>
               <button tabIndex="0" className='drawShapes' onClick={() => {ReactGA.event('wpa_transcript_create',{'category': 'TRANSCRIPTION', 'action':'INITIATE_CREATE_WORKFLOW'});
                   toggleWelcomeScreen(false); setWorkflow('create-features')}}>
                     <AddInNewIcon className="icon"/>
@@ -233,7 +236,7 @@ function App() {
                     </button>
               </div>
             }
-        
+         */}
           </>
         }
         
