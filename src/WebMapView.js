@@ -6,7 +6,7 @@ import MapView from '@arcgis/core/views/MapView';
 import FeatureLayer from '@arcgis/core/layers/FeatureLayer';
 //import FeatureLayerView from '@arcgis/core/views/layers/FeatureLayerView';
 import TileLayer from '@arcgis/core/layers/TileLayer';
-//import VectorTileLayer from '@arcgis/core/layers/VectorTileLayer';
+import VectorTileLayer from '@arcgis/core/layers/VectorTileLayer';
 import Compass from '@arcgis/core/widgets/Compass';
 import Editor from '@arcgis/core/widgets/Editor';
 import Popup from "@arcgis/core/widgets/Popup.js";
@@ -31,11 +31,13 @@ export class WebMapView extends React.Component {
     //this.featureTileUrl = 'https://tiles.arcgis.com/tiles/jWQlP64OuwDh6GGX/arcgis/rest/services/osage_cache3/MapServer';
     this.featureVectorUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Maps_Land_Parcels_Public/FeatureServer/0';
     //this.featureVectorUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Maps_Land_Parcels_Osage/FeatureServer/0';
-    this.featureVectorTileUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Maps_Land_Parcels_Vector_Tile/MapServer';
+    this.featureVectorTileUrl = 'https://vectortileservices1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Maps_Land_Parcels_Vector_Tile/VectorTileServer';
     this.backgroundFeatureUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/ArcGIS/rest/services/Oklahoma_Public_Land_Survey_Sections/FeatureServer/0';
     //this.backgroundFeatureUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/PLSSFirstDivis_Osage/FeatureServer/0';
     this.reviewerTableUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Reviewers/FeatureServer/0';
     
+
+
     this.mapRef = React.createRef();
     this.workflow = props.workflow;
     this.editThis = this.editThis.bind(this);
@@ -140,7 +142,7 @@ componentDidMount() {
         url: this.featureTileUrl
       });
       
-      //let featureVectorTileLayer = new VectorTileLayer(this.featureVectorTileUrl);
+      let featureVectorTileLayer = new VectorTileLayer(this.featureVectorTileUrl, {maxScale:40000});
 
       this.map = new ArcGISMap({
         basemap: new Basemap({baseLayers:[featureTileLayer]})
@@ -209,6 +211,7 @@ componentDidMount() {
          
       this.featureVectorLayer = new FeatureLayer({
         url: this.featureVectorUrl,
+        minScale: 40000,
         renderer:  {
           type: "simple",  // autocasts as new SimpleRenderer()
           symbol: {
@@ -410,6 +413,7 @@ componentDidMount() {
       }
 
         this.map.add(this.featureVectorLayer);
+        this.map.add(featureVectorTileLayer);
     
 }
 
