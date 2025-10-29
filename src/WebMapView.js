@@ -15,7 +15,8 @@ import Graphic from '@arcgis/core/Graphic';
 //import DistanceMeasurement2D from '@arcgis/core/widgets/DistanceMeasurement2D';
 import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
 import * as geodesicUtils from "@arcgis/core/geometry/support/geodesicUtils";
-import {CreateFormTemplate, ReviewFormTemplate, ThankYouTemplate} from './FormTemplates';
+
+import {createFormTemplate, reviewFormTemplate, ThankYouTemplate} from './FormTemplates';
 import {ReactComponent as LoadIndicator} from './loader.svg';
 
 function getRandomInt(max) {
@@ -28,12 +29,9 @@ export class WebMapView extends React.Component {
 
     //TODO move these URLs into a separate file
     this.featureTileUrl = 'https://tiles.arcgis.com/tiles/jWQlP64OuwDh6GGX/arcgis/rest/services/_wpa_all_6Aug2020/MapServer';
-    //this.featureTileUrl = 'https://tiles.arcgis.com/tiles/jWQlP64OuwDh6GGX/arcgis/rest/services/osage_cache3/MapServer';
-    this.featureVectorUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Maps_Land_Parcels_Public/FeatureServer/0';
-    //this.featureVectorUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Maps_Land_Parcels_Osage/FeatureServer/0';
+    this.featureVectorUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Maps_Land_Parcels_Public/FeatureServer';
     this.featureVectorTileUrl = 'https://vectortileservices1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Maps_Land_Parcels_Vector_Tile/VectorTileServer';
     this.backgroundFeatureUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/ArcGIS/rest/services/Oklahoma_Public_Land_Survey_Sections/FeatureServer/0';
-    //this.backgroundFeatureUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/PLSSFirstDivis_Osage/FeatureServer/0';
     this.reviewerTableUrl = 'https://services1.arcgis.com/jWQlP64OuwDh6GGX/arcgis/rest/services/WPA_Reviewers/FeatureServer/0';
     
 
@@ -142,8 +140,8 @@ componentDidMount() {
         url: this.featureTileUrl
       });
       
-      let featureVectorTileLayer = new VectorTileLayer(this.featureVectorTileUrl, {maxScale:40000});
-
+      let featureVectorTileLayer = new VectorTileLayer(this.featureVectorTileUrl, {maxScale:75000});
+      
       this.map = new ArcGISMap({
         basemap: new Basemap({baseLayers:[featureTileLayer]})
       });
@@ -160,8 +158,10 @@ componentDidMount() {
           color: [255, 255,255, 1],
           haloOpacity:1,
           fillOpacity: 0.3
-        },
-        popup: new Popup({
+        }
+        
+      });
+      this.view.popup = new Popup({
           dockEnabled: true,
           dockOptions: {
             // Disables the dock button from the popup
@@ -169,15 +169,22 @@ componentDidMount() {
             // Ignore the default sizes that trigger responsive docking
             breakpoint: false
           }
-        })
-      });
-
+        });
+        
       this.compass = new Compass({
         view: this.view
       });
       
-      this.loadIndicatorWatch = this.view.watch('updating', this.toggleLoadIndicator);
-      this.view.watch('rotation', this.rotationChange);
+      this.loadIndicatorWatch = reactiveUtils.watch(
+        () => this.view.updating,
+        (updating) => { 
+          this.toggleLoadIndicator(updating)
+        }
+      );
+      this.view.watch = reactiveUtils.watch(
+        () => this.view.rotation,  
+        this.rotationChange
+      );
 
       var refreshButton = document.createElement('div');
       refreshButton.className = 'esri-icon-refresh esri-widget--button esri-widget esri-interactive ';
@@ -208,26 +215,35 @@ componentDidMount() {
       //   unit: 'feet'
       // });
       //this.view.ui.add(this.measurement, 'bottom-left');
-         
+      
       this.featureVectorLayer = new FeatureLayer({
         url: this.featureVectorUrl,
-        minScale: 40000,
-        renderer:  {
-          type: "simple",  // autocasts as new SimpleRenderer()
-          symbol: {
-            type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
-            color: [255,0,0,0.2],
-            outline: {  // autocasts as new SimpleLineSymbol()
-              width: 1,
-              color: "red"
-            }
-          }
-        },
-        //definitionExpression
-        popupTemplate: ReviewFormTemplate,
-        formTemplate: CreateFormTemplate,
-        groupDisplay: 'sequential'
+        popupTemplate: reviewFormTemplate,
+        formTemplate: createFormTemplate,
+        groupDisplay: 'sequential',
+        minScale: 75000
       });
+
+      // this.featureVectorLayer = new FeatureLayer({
+      //   url: this.featureVectorUrl,
+      //   minScale: 75000,
+      //   editingEnabled: true,
+      //   renderer:  {
+      //     type: "simple",  // autocasts as new SimpleRenderer()
+      //     symbol: {
+      //       type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
+      //       color: [255,0,0,0.2],
+      //       outline: {  // autocasts as new SimpleLineSymbol()
+      //         width: 1,
+      //         color: "red"
+      //       }
+      //     }
+      //   },
+      //   //definitionExpression
+      //   //popupTemplate: reviewFormTemplate,
+      //   //formTemplate: createFormTemplate,
+      //   groupDisplay: 'sequential'
+      // });
 
       this.featureVectorLayer.on('edits', (e) => {
         if (e.updatedFeatures.length > 0 && this.highlightedFeature) {
@@ -283,10 +299,15 @@ componentDidMount() {
           }
         } );
       var that = this;
+      // this.editor = new Editor({
+      //   view: this.view
+      // });
+      
       this.editor = new Editor({
         view: this.view,
         visibleElements: {editFeaturesSection: false},
-        allowedWorkflows: [this.workflow],
+        //allowedWorkflows: [this.workflow],
+        allowedWorkflows:["create-features"],
         snappingOptions: {
            enabled: true,
            featureSources: [
@@ -299,8 +320,10 @@ componentDidMount() {
           layer: this.featureVectorLayer,
           attachmentsOnCreateEnabled: false,
           attachmentsOnUpdateEnabled: false,
-          deleteEnabled: false
-        }],
+          deleteEnabled: false,
+          enabled: true
+        },
+      ],
         supportingWidgetDefaults: {
           featureForm: {
             id: 'featureForm'
@@ -313,8 +336,8 @@ componentDidMount() {
       // I can't believe this is the only way to override widget labelling, but here we are
       this.editor.postInitialize = function(){
         //reactiveUtils.watch(()=>this.messages, (messages) => {
-          console.log(this);
           window.editor_widget = this;
+          window._map_ = this.view.map;
           this.messages.widgetLabel = 'WPA Maps';
           this.messages.createFeatures = 'Draw new shapes';
           this.messages.editFeature = 'Review an existing record';
@@ -336,28 +359,59 @@ componentDidMount() {
 
       //an attempt to prevent identical features from being created due to lack of feedback
       //from the editor widget
-      this.editor.viewModel.watch('syncing', 
-        function(newVal,oldVal, propName, target){
-          
-          let editButton = document.getElementsByClassName('esri-editor__control-button');
-          if (editButton.length === 0){
-            return;
-          }
+      // this.loadIndicatorWatch = reactiveUtils.watch(
+      //   () => this.view.updating,
+      //   (updating) => { 
+      //     this.toggleLoadIndicator(updating)
+      //   }
+      // );
+
+      // reactiveUtils.watch(
+      //   () => this.editor.viewModel,
+      //   (syncing) =>{
+      //           let editButton = document.getElementsByClassName('esri-editor__control-button');
+      //     if (editButton.length === 0){
+      //       return;
+      //     }
         
-          that.toggleLoadIndicator(newVal,oldVal); 
+      //     that.toggleLoadIndicator(newVal,oldVal); 
             
-          if (newVal === true) {
-            editButton[0].disabled = 'disabled';
-            editButton[0].classList.add('esri-button--disabled');
-          }
+      //     if (newVal === true) {
+      //       editButton[0].disabled = 'disabled';
+      //       editButton[0].classList.add('esri-button--disabled');
+      //     }
 
-          if (newVal === false) {
+      //     if (newVal === false) {
 
-            editButton[0].removeAttribute('disabled');
-            editButton[0].classList.remove('esri-button--disabled');
-          }
-        }
-      );
+      //       editButton[0].removeAttribute('disabled');
+      //       editButton[0].classList.remove('esri-button--disabled');
+      //     }
+      //   }
+
+      // )
+      
+      // this.editor.viewModel.watch('syncing', 
+      //   function(){
+          
+      //     let editButton = document.getElementsByClassName('esri-editor__control-button');
+      //     if (editButton.length === 0){
+      //       return;
+      //     }
+        
+      //     that.toggleLoadIndicator(newVal,oldVal); 
+            
+      //     if (newVal === true) {
+      //       editButton[0].disabled = 'disabled';
+      //       editButton[0].classList.add('esri-button--disabled');
+      //     }
+
+      //     if (newVal === false) {
+
+      //       editButton[0].removeAttribute('disabled');
+      //       editButton[0].classList.remove('esri-button--disabled');
+      //     }
+      //   }
+      // );
 
       
       //this.editor.viewModel.featureFormViewModel.on("value-change", function(e){console.log("value-change")});
@@ -482,6 +536,7 @@ sayThanks() {
 editThis() {
   var view = this.view;
   var editor = this.editor; 
+
   view.when(function () {
 
             // If the EditorViewModel's activeWorkflow is null, make the popup not visible

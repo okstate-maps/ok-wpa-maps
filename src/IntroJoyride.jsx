@@ -91,14 +91,12 @@ export function IntroJoyride(props) {
       content: 
       <>
         <h3>Keep track of your progress.</h3>
-        <div className='imgContainer'>
-        </div>
         <p>Sign in with your ArcGIS Online account. Or, <a href={"https://www.arcgis.com/sharing/rest/oauth2/signup?client_id=l3OWRmRCGfkAN4Dh&redirect_uri=http://localhost:3000/ok-wpa-maps&response_type=code"}>
 create one</a> for free.</p>
 
       </>,
       placement: 'center',
-      target: '.trackProgress',
+      target: 'div.trackProgress',
       disableBeacon: true
 
     },

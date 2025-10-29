@@ -79,7 +79,8 @@ function App() {
     'Wow!',
     'That\'s super!',
     'Awesome!',
-    'Alright!'
+    'Alright!',
+    'Very nice!'
   ];
 
 

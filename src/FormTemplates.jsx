@@ -1,5 +1,6 @@
 import React from 'react';
-
+import PopupTemplate from "@arcgis/core/PopupTemplate.js";
+import FormTemplate from "@arcgis/core/form/FormTemplate.js";
 
 const editThisAction = {
     title: 'Edit feature',
@@ -13,7 +14,7 @@ const thisLooksOkAction = {
     className: 'esri-icon-check-mark'
 };
 
-export const CreateFormTemplate = {
+export const createFormTemplate = new FormTemplate( {
         title: 'Land Info',
         elements: [{ 
           type: 'group',
@@ -61,10 +62,10 @@ export const CreateFormTemplate = {
                 label: 'Marked with an X?'
               }
         ]
-      }
+      });
 
 
-export const ReviewFormTemplate = {
+export const reviewFormTemplate = new PopupTemplate({
     title: 'Please doublecheck this information.',
     content: [
       {
@@ -100,7 +101,8 @@ export const ReviewFormTemplate = {
     ],
     //overwriteActions: true,
     actions: [thisLooksOkAction, editThisAction]
-}
+});
+
  export const ThankYouTemplate =
     <>     
       <div>
@@ -110,4 +112,4 @@ export const ReviewFormTemplate = {
     </>;
 
 
-export default CreateFormTemplate;
+export default createFormTemplate;
