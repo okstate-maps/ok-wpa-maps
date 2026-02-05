@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkok_wpa_maps=self.webpackChunkok_wpa_maps||[]).push([[98844],{98844(e,t,s){s.r(t),s.d(t,{execute:()=>p,isAsync:()=>r});var a=s(11217),n=s(52847),i=s(81130);function p(e){let{templatePart:t,shape:s,edits:p,relationships:r,mode:o}=e;if(!(0,i.Bi)(s))return;const{rings:l}=s;for(let i=0;i<l.length;i++)if(l[i].length>0){const e=(0,n.$S)(s,i,0);return void(0,a.fS)({templatePart:t,shape:e,edits:p,relationships:r,mode:o},"V0")}}const r=!1}}]);
+//# sourceMappingURL=98844.aecfe163.chunk.js.map

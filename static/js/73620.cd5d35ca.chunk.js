@@ -1,2 +1,0 @@
-"use strict";(self.webpackChunkok_wpa_maps=self.webpackChunkok_wpa_maps||[]).push([[73620],{73620:(s,r,e)=>{e.d(r,{default:()=>a});var t=e(97002);class a extends t.p{constructor(){super(...arguments),this.errors=null}syntaxError(s,r,e,t,a,o){this.errors||(this.errors=[]),this.errors.push({line:e,column:t,msg:a,e:o})}}}}]);
-//# sourceMappingURL=73620.cd5d35ca.chunk.js.map
