@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkok_wpa_maps=self.webpackChunkok_wpa_maps||[]).push([[65673],{65673(t,e,n){n.d(e,{getDatasetFormat:()=>p,guessExtensionFromURI:()=>l});var a=n(89379),s=n(32869);const o=/\.(\w+)$/;function l(t){const e=new URL(t).pathname.match(o);return!e||e.length<2?null:e[1].toUpperCase()}const p=async(t,e)=>{var n;const o=await(0,s.A)(t,(0,a.A)((0,a.A)({},e),{},{method:"head"})),l=null===o||void 0===o||null===(n=o.getHeader)||void 0===n?void 0:n.call(o,"Content-Type");return l?l.split("/")[1]:null}}}]);
+//# sourceMappingURL=65673.474886ca.chunk.js.map
