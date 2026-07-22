@@ -4,13 +4,11 @@
   "private": true,
   "homepage": "https://okstate-maps.github.io/ok-wpa-maps",
   "dependencies": {
-    "@arcgis/core": "^4.34",
-
+    "@arcgis/core": "5.0.0",
     "@esri/calcite-ui-icons": "^3.24.8",
     "@testing-library/jest-dom": "^6.1.4",
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^14.5.1",
-    "gh-pages": "^6.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-ga4": "^2.1.0",
@@ -46,5 +44,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "gh-pages": "github:tschaub/gh-pages"
   }
 }

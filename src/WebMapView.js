@@ -216,34 +216,34 @@ componentDidMount() {
       // });
       //this.view.ui.add(this.measurement, 'bottom-left');
       
-      this.featureVectorLayer = new FeatureLayer({
-        url: this.featureVectorUrl,
-        popupTemplate: reviewFormTemplate,
-        formTemplate: createFormTemplate,
-        groupDisplay: 'sequential',
-        minScale: 75000
-      });
-
       // this.featureVectorLayer = new FeatureLayer({
       //   url: this.featureVectorUrl,
-      //   minScale: 75000,
-      //   editingEnabled: true,
-      //   renderer:  {
-      //     type: "simple",  // autocasts as new SimpleRenderer()
-      //     symbol: {
-      //       type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
-      //       color: [255,0,0,0.2],
-      //       outline: {  // autocasts as new SimpleLineSymbol()
-      //         width: 1,
-      //         color: "red"
-      //       }
-      //     }
-      //   },
-      //   //definitionExpression
-      //   //popupTemplate: reviewFormTemplate,
-      //   //formTemplate: createFormTemplate,
-      //   groupDisplay: 'sequential'
+      //   popupTemplate: reviewFormTemplate,
+      //   formTemplate: createFormTemplate,
+      //   groupDisplay: 'sequential',
+      //   minScale: 75000
       // });
+
+      this.featureVectorLayer = new FeatureLayer({
+        url: this.featureVectorUrl,
+        minScale: 75000,
+        editingEnabled: true,
+        renderer:  {
+          type: "simple",  // autocasts as new SimpleRenderer()
+          symbol: {
+            type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
+            color: [255,0,0,0.2],
+            outline: {  // autocasts as new SimpleLineSymbol()
+              width: 1,
+              color: "red"
+            }
+          }
+        },
+        //definitionExpression
+        popupTemplate: reviewFormTemplate,
+        formTemplate: createFormTemplate,
+        groupDisplay: 'sequential'
+      });
 
       this.featureVectorLayer.on('edits', (e) => {
         if (e.updatedFeatures.length > 0 && this.highlightedFeature) {
