@@ -1,0 +1,2 @@
+"use strict";(globalThis.webpackChunkok_wpa_maps||=[]).push([[81702],{81702(e,s,t){t.r(s);var o=t(6326),r=t(42553),i=t(64385);let n=class extends r.o{constructor(e){super(e),this.versionName=void 0,this.sessionId=void 0}};(0,o.Cg)([(0,i.MZ)({type:String,json:{write:!0}})],n.prototype,"versionName",void 0),(0,o.Cg)([(0,i.MZ)({type:String,json:{write:!0}})],n.prototype,"sessionId",void 0),n=(0,o.Cg)([(0,i.$K)("esri.rest.versionManagement.support.DeleteVersionParameters")],n);const a=n;t.d(s,["default",0,a])}}]);
+//# sourceMappingURL=81702.d5fa60f8.chunk.js.map

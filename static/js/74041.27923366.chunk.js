@@ -1,0 +1,2 @@
+"use strict";(globalThis.webpackChunkok_wpa_maps||=[]).push([[74041],{74041(n,t,r){r.r(t),r.d(t,{extractRegion:()=>u,getCountry:()=>i});var e=r(30873);const o="Global";function u(n){if(function(n){return 0===(0,e.a)(n).countries.length}(n))return o;const t=n.indexOf("/");return-1===t?n:n.slice(0,t)}function i(n){return(0,e.g)(n)?.id??n}r.d(t,["global",0,o])}}]);
+//# sourceMappingURL=74041.27923366.chunk.js.map

@@ -1,0 +1,2 @@
+"use strict";(globalThis.webpackChunkok_wpa_maps||=[]).push([[98590],{98590(s,e,a){a.r(e),a.d(e,{default:()=>d});var l=a(6326),r=a(64385),t=a(93565),u=a(29992);class c extends u.A{constructor(){super(...arguments),this.layer=null}}let n=class extends((0,t.C)(c)){};n=(0,l.Cg)([(0,r.$K)("esri.views.2d.layers.KnowledgeGraphSublayerView2D")],n);const d=n}}]);
+//# sourceMappingURL=98590.3b768c14.chunk.js.map

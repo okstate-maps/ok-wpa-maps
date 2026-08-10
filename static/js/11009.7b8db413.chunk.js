@@ -1,0 +1,2 @@
+"use strict";(globalThis.webpackChunkok_wpa_maps||=[]).push([[11009],{11009(s,e,a){a.r(e),a.d(e,{default:()=>n});var r=a(6326),t=a(64385),l=a(93565),u=a(29992);class c extends u.A{constructor(){super(...arguments),this.layer=null}}let i=class extends((0,l.C)(c)){};i=(0,r.Cg)([(0,t.$K)("esri.views.2d.layers.ParquetLayerView2D")],i);const n=i}}]);
+//# sourceMappingURL=11009.7b8db413.chunk.js.map

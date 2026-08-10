@@ -1,0 +1,2 @@
+"use strict";(globalThis.webpackChunkok_wpa_maps||=[]).push([[73789],{73789(e,s,t){t.r(s),t.d(s,{default:()=>l});var a=t(6326),r=t(64385),d=t(93565),n=t(29992);class p extends n.A{constructor(){super(...arguments),this.layer=null}get updateSuspended(){const e=this.parent?.dynamicGroupLayerView;return this.suspended&&(!e||!0===e.suspended)}}(0,a.Cg)([(0,r.MZ)()],p.prototype,"updateSuspended",null);let u=class extends((0,d.C)(p)){};u=(0,a.Cg)([(0,r.$K)("esri.views.2d.layers.CatalogFootprintLayerView2D")],u);const l=u}}]);
+//# sourceMappingURL=73789.f4d79cc0.chunk.js.map

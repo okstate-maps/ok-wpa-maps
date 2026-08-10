@@ -1,0 +1,2 @@
+"use strict";(globalThis.webpackChunkok_wpa_maps||=[]).push([[19842],{19842(s,e,a){a.r(e);var t=a(6326),r=a(64385),l=a(93565),n=a(51364);let u=class extends((0,l.C)(n.A)){};u=(0,t.Cg)([(0,r.$K)("esri.views.2d.layers.AnnotationFeatureLayerView2D")],u);const c=u;a.d(e,["default",0,c])},51364(s,e,a){a.d(e,{A:()=>r});var t=a(29992);class r extends t.A{constructor(){super(...arguments),this.layer=null}}}}]);
+//# sourceMappingURL=19842.7ad5171a.chunk.js.map

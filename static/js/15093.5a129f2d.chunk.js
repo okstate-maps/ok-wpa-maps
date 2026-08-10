@@ -1,0 +1,2 @@
+"use strict";(globalThis.webpackChunkok_wpa_maps||=[]).push([[15093],{15093(s,i,t){t.d(i,{stopEditing:()=>a});var n=t(32869),o=t(50076),e=t(54994);async function a(s,i,t,a,r){if(!i)throw new o.A("stop-editing:missing-guid","guid for version is missing");const d=(0,e.Dl)(s),u=(0,e.jV)(d.query,{query:(0,e.lF)({sessionId:t,saveEdits:a,f:"json"}),...r,method:"post"});i.startsWith("{")&&(i=i.slice(1,-1));const c=`${d.path}/versions/${i}/stopEditing`,{data:p}=await(0,n.A)(c,u);return p||{success:!1}}}}]);
+//# sourceMappingURL=15093.5a129f2d.chunk.js.map
