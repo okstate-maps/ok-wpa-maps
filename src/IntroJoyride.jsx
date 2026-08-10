@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ReactComponent as PencilIcon} from "./svg/pencil-16.svg";
 import { ReactComponent as CheckIcon} from "./svg/check-16.svg";
-import Joyride, { CallBackProps, STATUS, Step, StoreHelpers } from 'react-joyride';
+import { Joyride, CallBackProps, STATUS, Step, StoreHelpers } from 'react-joyride';
 export function IntroJoyride(props) {
 	const [steps, setSteps] = useState([
   

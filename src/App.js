@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ReactGA from "react-ga4";
 import Modal from 'react-modal';
+import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 
 //import { loadModules } from 'esri-loader';
 import OAuthInfo from '@arcgis/core/identity/OAuthInfo';
@@ -63,15 +64,15 @@ const customStyles = {
 };
 
 function App() {
-  const [welcomeScreen, toggleWelcomeScreen] = useState(true);
   const [modalIsOpen, setIsOpen] = useState(false);
-  const [workflow, setWorkflow] = useState(0);
   const [modalContent, setModalContent] = useState('');
   const [runIntro, toggleIntro] = useState(false);
   const [creatorCount, setCreatorCount] = useState(false);
   const [creds, setCreds] = useState(false);
   const [userName, setUserName] = useState(false);
   const [info, setInfo] = useState(false);
+
+  const navigate = useNavigate();
 
   var listOfRandomPraise= [
     'Good job!',
@@ -84,7 +85,7 @@ function App() {
   ];
 
 
-  const [randomPraise, setRandomPraise] = useState(
+  const [randomPraise] = useState(
     listOfRandomPraise[Math.floor(Math.random() * Math.floor(listOfRandomPraise.length))]
   );
 
@@ -132,7 +133,7 @@ function App() {
         .checkSignInStatus(oauth_info.portalUrl + '/sharing')
         .then((creds) => {
           setCreds(creds);
-          var portal = new Portal(oauth_info.portalUrl).load().then((p) => {
+          new Portal(oauth_info.portalUrl).load().then((p) => {
             setUserName(p.user.fullName);
           });
 
@@ -181,73 +182,82 @@ function App() {
         >
           {modalContent}
         </Modal>
-
-        {welcomeScreen === true &&
-          <>
-
-            <h1>Oklahoma 1936 Land Ownership Map Transcription</h1>
-            {/*<h2>Under maintenance. Data collection is currently paused.</h2>*/}
-                    
-            <div className='flex-row'>
-              <button tabIndex="0" className='drawShapes' onClick={() => {ReactGA.event('wpa_transcript_create',{'category': 'TRANSCRIPTION', 'action':'INITIATE_CREATE_WORKFLOW'});
-                  toggleWelcomeScreen(false); setWorkflow('create-features')}}>
-                    <AddInNewIcon className="icon"/>
-                  <br/>Draw some shapes
-              </button>
-              <button tabIndex="0" className='reviewShapes' onClick={() => {ReactGA.event('wpa_transcript_create',{'category': 'TRANSCRIPTION', 'action':'INITIATE_REVIEW_WORKFLOW'});
-                  toggleWelcomeScreen(false); setWorkflow('update')}}>
-                    <EditAttributesIcon className="icon"/>
-                  <br/>Review existing shapes
-              </button>
-              <button tabIndex="0" onClick={() => {ReactGA.event('tutorial_begin',{'category': 'INTRO', 'action':'INTRO_TOGGLE'});
-                  toggleIntro(!runIntro)}}>
-                    <QuestionIcon className="icon"/>
-                  <br/>View the intro
-              </button>
-            </div>
-
-            {userName === false &&
-            <div className="trackProgress">
-              <h2>Track your progress:</h2>
+        <h1><a href="#/">Oklahoma 1936 Land Ownership Map Transcription</a></h1>
+        <Routes>
+          <Route path="/" element={
+            <>
               <div className='flex-row'>
-                <br/><br/>
-                <button tabIndex="0" className='signInOut' onClick={function(){
-                    ReactGA.event('login',{'category': 'TRANSCRIPTION', 'action':'login'}); 
-                    esriId.getCredential(info.portalUrl + '/sharing')
-                  .then((credential) => {setCreds(credential);})}}>
-                  <SignInIcon className="icon"/>
-                <br/> Sign in</button>
-
-                <a tabIndex="0" href={signUpUrl}><button onClick={function(){ ReactGA.event('sign_up',{'category': 'SIGN_UP','action': 'SIGN_UP'})}} className='createAccount'>
-                <UserPlusIcon className="icon"/>
-                <br/> Create an account</button></a>
-              </div> 
-            </div>
-          }
-            {userName !== false && creatorCount !== false &&
-              <div className='flex-row'>
-                <h3>Hi {userName}! So far you've added 
-                  <span style={{fontSize:'2em'}}>&nbsp;{creatorCount}&nbsp;</span> 
-                    {creatorCount === 1 ? 'shape' : 'shapes'}. {creatorCount > 0 ? randomPraise : ''}
-                </h3>
-                <br/><button className='signInOut' onClick={function(){creds.destroy(); window.location = window.location.pathname}}>
-                      <SignOutIcon className="icon"/>
-                      <br/> Sign out
-                    </button>
+                <button tabIndex="0" className='drawShapes' onClick={() => {
+                    ReactGA.event('wpa_transcript_create',{'category': 'TRANSCRIPTION', 'action':'INITIATE_CREATE_WORKFLOW'});
+                    navigate('/create');
+                  }}>
+                      <AddInNewIcon className="icon"/>
+                    <br/>Draw some shapes
+                </button>
+                <button tabIndex="0" className='reviewShapes' onClick={() => {
+                    ReactGA.event('wpa_transcript_create',{'category': 'TRANSCRIPTION', 'action':'INITIATE_REVIEW_WORKFLOW'});
+                    navigate('/review');
+                  }}>
+                      <EditAttributesIcon className="icon"/>
+                    <br/>Review existing shapes
+                </button>
+                <button tabIndex="0" onClick={() => {ReactGA.event('tutorial_begin',{'category': 'INTRO', 'action':'INTRO_TOGGLE'});
+                    toggleIntro(!runIntro)}}>
+                      <QuestionIcon className="icon"/>
+                    <br/>View the intro
+                </button>
               </div>
-            } 
-        
+
+              {userName === false &&
+              <div className="trackProgress">
+                <h2>Track your progress:</h2>
+                <div className='flex-row'>
+                  <br/><br/>
+                  <button tabIndex="0" className='signInOut' onClick={function(){
+                      ReactGA.event('login',{'category': 'TRANSCRIPTION', 'action':'login'}); 
+                      esriId.getCredential(info.portalUrl + '/sharing')
+                    .then((credential) => {setCreds(credential);})}}>
+                    <SignInIcon className="icon"/>
+                  <br/> Sign in</button>
+
+                  <a tabIndex="0" href={signUpUrl}><button onClick={function(){ ReactGA.event('sign_up',{'category': 'SIGN_UP','action': 'SIGN_UP'})}} className='createAccount'>
+                  <UserPlusIcon className="icon"/>
+                  <br/> Create an account</button></a>
+                </div> 
+              </div>
+            }
+              {userName !== false && creatorCount !== false &&
+                <div className='flex-row'>
+                  <h3>Hi {userName}! So far you've added 
+                    <span style={{fontSize:'2em'}}>&nbsp;{creatorCount}&nbsp;</span> 
+                      {creatorCount === 1 ? 'shape' : 'shapes'}. {creatorCount > 0 ? randomPraise : ''}
+                  </h3>
+                  <br/><button className='signInOut' onClick={function(){creds.destroy(); window.location = window.location.pathname}}>
+                        <SignOutIcon className="icon"/>
+                        <br/> Sign out
+                      </button>
+                </div>
+              } 
           </>
-        }
-        
-        {welcomeScreen === false &&
-          <WebMapView 
-            workflow={workflow} 
-            creds={creds}
-            openModal={openModal}
-            closeModal={closeModal}
-            setModalContent={setModalContent}/>
-        }
+          } />
+          <Route path="/create" element={
+            <WebMapView 
+              workflow="create-features" 
+              creds={creds}
+              openModal={openModal}
+              closeModal={closeModal}
+              setModalContent={setModalContent} />
+          } />
+          <Route path="/review" element={
+            <WebMapView 
+              workflow="update" 
+              creds={creds}
+              openModal={openModal}
+              closeModal={closeModal}
+              setModalContent={setModalContent} />
+          } />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </div>
     );
   }

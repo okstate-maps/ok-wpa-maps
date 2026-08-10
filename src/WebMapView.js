@@ -126,12 +126,7 @@ export class WebMapView extends React.Component {
     }
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
-  //   if (prevState.backgroundFeatureObjectIds === null &&
-  //     this.state.backgroundFeatureObjectIds !== null) {
-  //     this.getRandomBackgroundFeature();
-   //}
-  }
+
 
 componentDidMount() {
       this.graphic = Graphic;
