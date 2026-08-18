@@ -17,7 +17,7 @@ export function IntroJoyride(props) {
           </div>,
       placement: 'auto',
       target: '.drawShapes',
-      disableBeacon: true
+      skipBeacon: true
     },    
     // {
     //   content: 
@@ -29,7 +29,7 @@ export function IntroJoyride(props) {
     //       </div>,
     //   placement: 'auto',
     //   target: '.drawShapes',
-    //   disableBeacon: false
+    //   skipBeacon: false
     // },
 
     {
@@ -49,7 +49,7 @@ export function IntroJoyride(props) {
       </div>,
       placement: 'auto',
       target: '.reviewShapes',
-      disableBeacon: true
+      skipBeacon: true
     
     },
     {
@@ -69,7 +69,7 @@ export function IntroJoyride(props) {
       </div>,
       placement: 'auto',
       target: '.reviewShapes',
-      disableBeacon: true
+      skipBeacon: true
 
     },
     {
@@ -84,7 +84,7 @@ export function IntroJoyride(props) {
       </>,
       placement: 'center',
       target: 'body',
-      disableBeacon: true
+      skipBeacon: true
 
     },
     {
@@ -97,7 +97,7 @@ create one</a> for free.</p>
       </>,
       placement: 'center',
       target: 'div.trackProgress',
-      disableBeacon: true
+      skipBeacon: true
 
     },
     {
@@ -107,7 +107,7 @@ create one</a> for free.</p>
           </div>,
       placement: 'center',
       target: 'body',
-      disableBeacon: true
+      skipBeacon: true
     },      
     
   ]);
@@ -127,6 +127,7 @@ create one</a> for free.</p>
           floaterProps={{disableAnimation:true}}
           run={props.runIntro}
           scrollToFirstStep={true}
+          skipBeacon={true}
           showProgress={true}
           showSkipButton={true}
           steps={steps}
@@ -135,7 +136,13 @@ create one</a> for free.</p>
               zIndex: 10000,
               width: 800
             },
+            spotlight: {
+              stroke: '#FF7300',
+              strokeWidth: 2,
+            },
           }}
+
+          
         />
   )
 }
